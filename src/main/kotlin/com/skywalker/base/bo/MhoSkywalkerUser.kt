@@ -1,4 +1,4 @@
-package com.skywalker.bo
+package com.skywalker.base.bo
 
 import java.util.*
 import javax.persistence.Entity

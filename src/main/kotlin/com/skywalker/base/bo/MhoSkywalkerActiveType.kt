@@ -1,4 +1,4 @@
-package com.skywalker.bo
+package com.skywalker.base.bo
 
 import java.util.*
 import javax.persistence.Entity
@@ -6,13 +6,12 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 
 @Entity
-data class MhoSkywalkerChatRoom(
-
+data class MhoSkywalkerActiveType(
         @Id
         @GeneratedValue
-        var roomId: Long,
-        var roomName: String,
-        var roomType: String,
+        var typeId: Long,
+        var typeName: String,
+        var typeImage: String,
         var timeCreate: Date,
         var isDelete: String
 )
