@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/users")
 class UserController(private val userService: UserService){
     @GetMapping("/findUser/{userId}")
-    fun findByLastName(@PathVariable userId:String)
+    fun findByUserId(@PathVariable userId:String)
             = userService.findAll()
 }
