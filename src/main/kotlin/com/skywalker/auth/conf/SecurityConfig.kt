@@ -25,10 +25,7 @@ class SecurityConfig(
         private val userDetailsService: UserDetailsService,
         private val statelessAuthenticationFilter: StatelessAuthenticationFilter
 ) : WebSecurityConfigurerAdapter(true) {
-    private val logger = LoggerFactory.getLogger(SecurityConfig::class.java)
     override fun configure(http: HttpSecurity) {
-        logger.info("dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")
-        // we use jwt so that we can disable csrf protection
         http.csrf().disable()
 
         http
@@ -38,15 +35,7 @@ class SecurityConfig(
                 .headers().cacheControl()
 
         http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/users").hasRole("USER")
-                .antMatchers(HttpMethod.GET, "/api/users/me").hasRole("USER")
-                .antMatchers(HttpMethod.PATCH, "/api/users/me").hasRole("USER")
-                .antMatchers(HttpMethod.GET, "/api/users/me/microposts").hasRole("USER")
-                .antMatchers(HttpMethod.POST, "/api/microposts/**").hasRole("USER")
-                .antMatchers(HttpMethod.DELETE, "/api/microposts/**").hasRole("USER")
-                .antMatchers(HttpMethod.POST, "/api/relationships/**").hasRole("USER")
-                .antMatchers(HttpMethod.DELETE, "/api/relationships/**").hasRole("USER")
-                .antMatchers(HttpMethod.GET, "/api/feed").hasRole("USER")
+                .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
