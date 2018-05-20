@@ -1,3 +1,6 @@
+package com.skywalker.auth.filter
+
+import com.skywalker.auth.service.TokenAuthenticationService
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -12,7 +15,6 @@ import javax.servlet.http.HttpServletResponse
 class StatelessAuthenticationFilter(
         private val tokenAuthenticationService: TokenAuthenticationService
 ) : GenericFilterBean() {
-
     override fun doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) {
         try {
             val authentication = tokenAuthenticationService.authentication(req as HttpServletRequest)
