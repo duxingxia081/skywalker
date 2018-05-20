@@ -4,5 +4,5 @@ import com.skywalker.base.bo.MhoSkywalkerUser
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserRepository : JpaRepository<MhoSkywalkerUser, Long> {
-    fun findByUserUsername(username: String): MhoSkywalkerUser?
+    fun findByUserName(userName: String): MhoSkywalkerUser?
 }

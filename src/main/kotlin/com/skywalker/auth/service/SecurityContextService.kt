@@ -1,4 +1,4 @@
-package com.myapp.auth
+package com.skywalker.auth.service
 
 import com.skywalker.base.bo.MhoSkywalkerUser
 

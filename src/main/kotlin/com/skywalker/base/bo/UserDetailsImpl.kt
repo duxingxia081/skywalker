@@ -1,4 +1,4 @@
-package com.myapp.domain
+package com.skywalker.base.bo
 
 import com.skywalker.base.bo.MhoSkywalkerUser
 import org.springframework.security.core.GrantedAuthority

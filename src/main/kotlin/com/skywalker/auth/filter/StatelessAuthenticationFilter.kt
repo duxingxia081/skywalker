@@ -1,6 +1,7 @@
 package com.skywalker.auth.filter
 
 import com.skywalker.auth.service.TokenAuthenticationService
+import io.jsonwebtoken.JwtException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse
 class StatelessAuthenticationFilter(
         private val tokenAuthenticationService: TokenAuthenticationService
 ) : GenericFilterBean() {
+
     override fun doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) {
         try {
             val authentication = tokenAuthenticationService.authentication(req as HttpServletRequest)
@@ -24,7 +26,7 @@ class StatelessAuthenticationFilter(
         } catch (e: AuthenticationException) {
             SecurityContextHolder.clearContext()
             (res as HttpServletResponse).status = HttpServletResponse.SC_UNAUTHORIZED
-        } catch (e: Exception) {
+        } catch (e: JwtException) {
             SecurityContextHolder.clearContext()
             (res as HttpServletResponse).status = HttpServletResponse.SC_UNAUTHORIZED
         }

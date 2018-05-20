@@ -1,6 +1,6 @@
-package com.myapp.service
+package com.skywalker.user.service.impl
 
-import com.myapp.domain.UserDetailsImpl
+import com.skywalker.base.bo.UserDetailsImpl
 import com.skywalker.user.repository.UserRepository
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -13,9 +13,9 @@ class UserDetailsServiceImpl(
     private val userRepository: UserRepository
 ) : UserDetailsService {
 
-    override fun loadUserByUsername(username: String): UserDetailsImpl =
+    override fun loadUserByUsername(userName: String): UserDetailsImpl =
         userRepository
-            .findByUserUsername(username)
+            .findByUserName(userName)
             ?.let(::UserDetailsImpl)
             ?.apply {
                 AccountStatusUserDetailsChecker().check(this)

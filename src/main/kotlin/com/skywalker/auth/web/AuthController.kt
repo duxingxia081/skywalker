@@ -1,8 +1,7 @@
-package com.myapp.controller
+package com.skywalker.auth.web
 
-import com.myapp.auth.TokenHandler
-import com.myapp.auth.SecurityContextService
 import com.skywalker.auth.handler.TokenHandler
+import com.skywalker.auth.service.SecurityContextService
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -31,13 +30,13 @@ class AuthController(
         SecurityContextHolder.getContext().authentication = authentication
 
         return securityContextService.currentUser()
-            .let { requireNotNull(it) }
-            .let { tokenHandler.createTokenForUser(it).let(::AuthResponse) }
+                .let { requireNotNull(it) }
+                .let { tokenHandler.createTokenForUser(it).let(::AuthResponse) }
     }
 
     data class AuthParams(
-        val userName: String,
-        val password: String
+            val userName: String,
+            val password: String
     )
 
     data class AuthResponse(val token: String)

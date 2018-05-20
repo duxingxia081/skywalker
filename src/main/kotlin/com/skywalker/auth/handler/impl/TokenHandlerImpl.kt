@@ -1,10 +1,11 @@
-package com.myapp.auth
+package com.skywalker.auth.handler.impl
 
-import com.myapp.domain.UserDetailsImpl
 import com.skywalker.auth.handler.TokenHandler
 import com.skywalker.base.bo.MhoSkywalkerUser
+import com.skywalker.base.bo.UserDetailsImpl
 import com.skywalker.user.repository.UserRepository
-import com.sun.org.apache.xml.internal.security.algorithms.SignatureAlgorithm
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
@@ -26,7 +27,7 @@ class TokenHandlerImpl(
             .subject
             .toLong()
 
-        return userRepository.findOne(userId).let(::UserDetailsImpl)
+        return userRepository.getOne(userId).let(::UserDetailsImpl)
     }
 
     override fun createTokenForUser(user: MhoSkywalkerUser): String {
