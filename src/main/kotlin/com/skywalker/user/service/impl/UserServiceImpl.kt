@@ -1,7 +1,7 @@
-package com.myapp.service
+package com.skywalker.user.service.impl
 
 import com.skywalker.base.bo.MhoSkywalkerUser
-import com.skywalker.user.dto.MhoSkywalkerUserDTO
+import com.skywalker.user.dto.SkywalkerUserDTO
 import com.skywalker.user.repository.UserRepository
 import com.skywalker.user.service.UserService
 import org.springframework.beans.BeanUtils
@@ -17,15 +17,25 @@ class UserServiceImpl(
         private val userRepository: UserRepository,
         private val validator: Validator
 ) : UserService{
-    override fun create(userDto: MhoSkywalkerUserDTO): MhoSkywalkerUserDTO {
+    override fun create(userDto: SkywalkerUserDTO): SkywalkerUserDTO {
         validate(userDto)
-        var user: MhoSkywalkerUser  = MhoSkywalkerUser();
+        var user = MhoSkywalkerUser()
         BeanUtils.copyProperties(userDto,user)
         user.password=encrypt(user.password)
         userRepository.save(user)
         return userDto
     }
-    private fun validate(user: MhoSkywalkerUserDTO) = validator.validate(user).apply {
+
+    override fun findByUserName(userName: String): SkywalkerUserDTO
+    {
+        var user:MhoSkywalkerUser = userRepository.findByUserName(userName)
+        var dto = SkywalkerUserDTO()
+        BeanUtils.copyProperties(user,dto)
+        return dto
+    }
+
+
+    private fun validate(user: SkywalkerUserDTO) = validator.validate(user).apply {
         if (isNotEmpty()) throw DataIntegrityViolationException(toString())
     }
     private fun encrypt(secret: String) = BCryptPasswordEncoder().encode(secret)

@@ -1,7 +1,8 @@
 package com.skywalker.user.service
 
-import com.skywalker.user.dto.MhoSkywalkerUserDTO
+import com.skywalker.user.dto.SkywalkerUserDTO
 
 interface UserService {
-    fun create(params: MhoSkywalkerUserDTO): MhoSkywalkerUserDTO
+    fun create(params: SkywalkerUserDTO): SkywalkerUserDTO
+    fun findByUserName(userName: String): SkywalkerUserDTO
 }
