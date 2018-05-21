@@ -2,7 +2,8 @@ package com.skywalker.auth.web
 
 import com.skywalker.auth.handler.TokenHandler
 import com.skywalker.auth.service.SecurityContextService
-import org.slf4j.LoggerFactory
+import com.skywalker.core.constants.ErrorConstants
+import com.skywalker.core.exception.ServiceException
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -19,19 +20,19 @@ class AuthController(
         private val tokenHandler: TokenHandler,
         private val securityContextService: SecurityContextService
 ) {
-
-    @Suppress("unused")
-    private val logger = LoggerFactory.getLogger(AuthController::class.java)
-
     @PostMapping
     fun auth(@RequestBody params: AuthParams): AuthResponse {
-        val loginToken = UsernamePasswordAuthenticationToken(params.userName, params.password)
-        val authentication = authenticationManager.authenticate(loginToken)
-        SecurityContextHolder.getContext().authentication = authentication
+        try {
+            val loginToken = UsernamePasswordAuthenticationToken(params.userName, params.password)
+            val authentication = authenticationManager.authenticate(loginToken)
+            SecurityContextHolder.getContext().authentication = authentication
 
-        return securityContextService.currentUser()
-                .let { requireNotNull(it) }
-                .let { tokenHandler.createTokenForUser(it).let(::AuthResponse) }
+            return securityContextService.currentUser()
+                    .let { requireNotNull(it) }
+                    .let { tokenHandler.createTokenForUser(it).let(::AuthResponse) }
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1101,ErrorConstants.ERROR_MSG_1101)
+        }
     }
 
     data class AuthParams(
