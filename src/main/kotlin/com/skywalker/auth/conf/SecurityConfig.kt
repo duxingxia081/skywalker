@@ -1,6 +1,8 @@
 package com.skywalker.auth.conf
 
 import com.skywalker.auth.filter.StatelessAuthenticationFilter
+import com.skywalker.core.constants.ErrorConstants
+import com.skywalker.core.exception.ServiceException
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,21 +28,25 @@ class SecurityConfig(
         private val statelessAuthenticationFilter: StatelessAuthenticationFilter
 ) : WebSecurityConfigurerAdapter(true) {
     override fun configure(http: HttpSecurity) {
-        http.csrf().disable()
+        try {
+            http.csrf().disable()
 
-        http
-                .exceptionHandling().and()
-                .anonymous().and()
-                .servletApi().and()
-                .headers().cacheControl()
+            http
+                    .exceptionHandling().and()
+                    .anonymous().and()
+                    .servletApi().and()
+                    .headers().cacheControl()
 
-        http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+            http.authorizeRequests()
+                    .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
+                    .and()
 
-        http.addFilterBefore(statelessAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            http.addFilterBefore(statelessAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+        } catch (e: AccessDeniedException) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1001, ErrorConstants.ERROR_MSG_1001)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_9999, e.message?:"访问权限系统错误")
+        }
     }
 
     @Bean
