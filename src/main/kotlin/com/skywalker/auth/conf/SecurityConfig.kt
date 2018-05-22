@@ -3,11 +3,9 @@ package com.skywalker.auth.conf
 import com.skywalker.auth.filter.StatelessAuthenticationFilter
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
-import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -16,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 
@@ -38,7 +35,7 @@ class SecurityConfig(
                     .headers().cacheControl()
 
             http.authorizeRequests()
-                    .antMatchers(HttpMethod.GET, "/api/users/**").hasRole("USER")
+                    .antMatchers(HttpMethod.GET, "/api/users/currentUser").hasRole("USER")
                     .and()
 
             http.addFilterBefore(statelessAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

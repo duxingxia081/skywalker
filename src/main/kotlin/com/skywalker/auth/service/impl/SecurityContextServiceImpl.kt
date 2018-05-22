@@ -9,10 +9,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class SecurityContextServiceImpl : SecurityContextService {
-
-    @Suppress("unused")
-    private val logger = LoggerFactory.getLogger(SecurityContextServiceImpl::class.java)
-
     override fun currentUser(): MhoSkywalkerUser? {
         return SecurityContextHolder
             .getContext()

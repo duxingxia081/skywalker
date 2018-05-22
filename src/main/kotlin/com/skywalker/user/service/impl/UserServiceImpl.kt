@@ -1,6 +1,8 @@
 package com.skywalker.user.service.impl
 
 import com.skywalker.base.bo.MhoSkywalkerUser
+import com.skywalker.core.constants.ErrorConstants
+import com.skywalker.core.exception.ServiceException
 import com.skywalker.user.dto.SkywalkerUserDTO
 import com.skywalker.user.repository.UserRepository
 import com.skywalker.user.service.UserService
@@ -16,27 +18,44 @@ import javax.validation.Validator
 class UserServiceImpl(
         private val userRepository: UserRepository,
         private val validator: Validator
-) : UserService{
+) : UserService {
     override fun create(userDto: SkywalkerUserDTO): SkywalkerUserDTO {
         validate(userDto)
-        var user = MhoSkywalkerUser()
-        BeanUtils.copyProperties(userDto,user)
-        user.password=encrypt(user.password)
-        userRepository.save(user)
+        var user = userRepository.findByUserName(userDto.userName)
+        if (null != user)
+            throw ServiceException(ErrorConstants.ERROR_CODE_1102, ErrorConstants.ERROR_MSG_1102)
+        try {
+            user = MhoSkywalkerUser()
+            BeanUtils.copyProperties(userDto, user)
+            user.password = encrypt(user.password)
+            userRepository.save(user)
+        } catch(e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1103, ErrorConstants.ERROR_MSG_1103)
+        }
         return userDto
     }
 
-    override fun findByUserName(userName: String): SkywalkerUserDTO
-    {
-        var user:MhoSkywalkerUser = userRepository.findByUserName(userName)
-        var dto = SkywalkerUserDTO()
-        BeanUtils.copyProperties(user,dto)
-        return dto
+    override fun findByUserName(userName: String): SkywalkerUserDTO? {
+        val user: MhoSkywalkerUser? = userRepository.findByUserName(userName)
+        if (null != user) {
+            var dto = SkywalkerUserDTO()
+            BeanUtils.copyProperties(user, dto)
+            return dto
+        }
+        return null
     }
 
+
+    override fun findById(userId: Long): SkywalkerUserDTO {
+        val user = userRepository.getOne(userId) ?: throw ServiceException(ErrorConstants.ERROR_CODE_1105, ErrorConstants.ERROR_MSG_1105)
+        var dto = SkywalkerUserDTO()
+        BeanUtils.copyProperties(user, dto)
+        return dto
+    }
 
     private fun validate(user: SkywalkerUserDTO) = validator.validate(user).apply {
         if (isNotEmpty()) throw DataIntegrityViolationException(toString())
     }
+
     private fun encrypt(secret: String) = BCryptPasswordEncoder().encode(secret)
 }
