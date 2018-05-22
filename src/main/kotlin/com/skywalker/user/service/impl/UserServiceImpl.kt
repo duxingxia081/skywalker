@@ -4,6 +4,7 @@ import com.skywalker.base.bo.MhoSkywalkerUser
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.user.dto.SkywalkerUserDTO
+import com.skywalker.user.dto.UserDTO
 import com.skywalker.user.repository.UserRepository
 import com.skywalker.user.service.UserService
 import org.springframework.beans.BeanUtils
@@ -46,9 +47,9 @@ class UserServiceImpl(
     }
 
 
-    override fun findById(userId: Long): SkywalkerUserDTO {
+    override fun findById(userId: Long): UserDTO {
         val user = userRepository.getOne(userId) ?: throw ServiceException(ErrorConstants.ERROR_CODE_1105, ErrorConstants.ERROR_MSG_1105)
-        var dto = SkywalkerUserDTO()
+        var dto = UserDTO()
         BeanUtils.copyProperties(user, dto)
         return dto
     }

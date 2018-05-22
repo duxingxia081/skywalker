@@ -2,13 +2,11 @@ package com.skywalker.user.dto
 
 import java.util.*
 
-data class SkywalkerUserDTO(
-        var userId: Long?=0L,
+data class UserDTO(
         var userName: String?="",
         var mobilePhone: String?="",
         var wechatId: String?="",
         var qqId: String?="",
-        var password: String?="",
         var nickname: String?="",
         var sign: String?="",
         var sex: String?="",
