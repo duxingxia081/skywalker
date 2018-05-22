@@ -3,19 +3,19 @@ package com.skywalker.user.dto
 import java.util.*
 
 data class SkywalkerUserDTO(
-        val userId: Long=0L,
-        val userName: String="",
-        val mobilePhone: String="",
-        val wechatId: String="",
-        val qqId: String="",
-        val password: String="",
-        val nickname: String="",
-        val sign: String="",
-        val sex: String="",
-        val address: String="",
-        val qrCodeImage: String="",
-        val headImage: String="",
-        val coverImage: String="",
-        val timeCreate: Date=Date(),
-        val isDelete: String=""
+        var userId: Long=0L,
+        var userName: String="",
+        var mobilePhone: String="",
+        var wechatId: String="",
+        var qqId: String="",
+        var password: String="",
+        var nickname: String="",
+        var sign: String="",
+        var sex: String="",
+        var address: String="",
+        var qrCodeImage: String="",
+        var headImage: String="",
+        var coverImage: String="",
+        var timeCreate: Date=Date(),
+        var isDelete: String=""
 )
