@@ -1,5 +1,7 @@
 package com.skywalker.core.exception
 
+import org.springframework.validation.FieldError
+
 /**
  * 异常类
  */
@@ -13,6 +15,15 @@ class ServiceException : Exception {
     constructor(errorKey: String, message: String) : super(message) {
         this.errorKey = errorKey
         this.value = message
+    }
+
+    constructor(errorKey: String, fieldErrors: List<FieldError>){
+        this.errorKey = errorKey
+        val sb = StringBuffer()
+        for (error in fieldErrors) {
+            sb.append(error.defaultMessage).append(";")
+        }
+        this.value = sb.toString()
     }
 
 }

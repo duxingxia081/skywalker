@@ -25,8 +25,9 @@ class GlobalExceptionHandler {
                 return ErrorResponse(targetEx.errorKey, targetEx.value)
             }
         }
-        return ErrorResponse("-1000", e.message!!)
+        return ErrorResponse("-1000", "系统错误")
     }
+
 }
 
 

@@ -8,6 +8,10 @@ object ErrorConstants {
     val ERROR_CODE_1001 = "-1001"
     //错误描述-无权访问
     val ERROR_MSG_1001 = "无权访问此页面"
+    //错误码-非法请求
+    val ERROR_CODE_1002 = "-1002"
+    //错误描述-非法请求
+    val ERROR_MSG_1002 = "非法请求"
     //错误码-登录错误
     val ERROR_CODE_1101 = "-1101"
     //登录错误
@@ -28,4 +32,10 @@ object ErrorConstants {
     val ERROR_CODE_1105 = "-1105"
     //错误描述-用户不存在
     val ERROR_MSG_1105= "用户不存在"
+    //错误码-参数不完整
+    val ERROR_CODE_1106 = "-1106"
+    //错误码-参数不能为空
+    val ERROR_CODE_1107 = "-1107"
+    //错误描述-参数不能为空
+    val ERROR_MSG_1107= "参数不能为空"
 }
