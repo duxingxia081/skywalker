@@ -25,9 +25,6 @@ class AuthController(
 ) {
     @PostMapping
     fun auth(@Valid @RequestBody params: AuthParams, result: BindingResult): AuthResponse {
-        if (null == params) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1002, ErrorConstants.ERROR_MSG_1102)
-        }
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.getFieldErrors())
         }
