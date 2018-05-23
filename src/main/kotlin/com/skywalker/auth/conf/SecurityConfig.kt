@@ -35,7 +35,7 @@ class SecurityConfig(
                     .headers().cacheControl()
 
             http.authorizeRequests()
-                    .antMatchers(HttpMethod.GET, "/api/users/currentUser").hasRole("USER")
+                    .antMatchers(HttpMethod.GET, "/users/currentUser").hasRole("USER")
                     .and()
 
             http.addFilterBefore(statelessAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
