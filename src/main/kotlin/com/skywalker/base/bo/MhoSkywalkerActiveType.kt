@@ -9,9 +9,9 @@ import javax.persistence.Id
 data class MhoSkywalkerActiveType(
         @Id
         @GeneratedValue
-        var typeId: Long,
-        var typeName: String,
-        var typeImage: String,
-        var timeCreate: Date,
-        var isDelete: String
+        var typeId: Long = 0L,
+        var typeName: String = "",
+        var typeImage: String = "",
+        var timeCreate: Date = Date(),
+        var isDelete: String = ""
 )

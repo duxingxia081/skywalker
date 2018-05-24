@@ -47,27 +47,6 @@ create table if not exists mho_skywalker_user_role (
 );
 alter table mho_skywalker_user_role add constraint user_role_user_id_role_id unique(user_id,role_id);
 
-create table if not exists mho_skywalker_resource (
-	resource_id int(11) not null primary key comment '资源ID',
-	resource_name varchar(255) not null unique comment '资源名',
-	resource_url varchar(255) not null comment '资源URL',
-	resource_method varchar(255) not null comment '资源方法',
-	time_create datetime default current_timestamp comment '创建时间',
-	is_delete char default 0 comment '是否删除'
-);
-alter table mho_skywalker_resource add constraint resource_url_method unique(resource_url,resource_method);
-
-create table if not exists mho_skywalker_role_resource (
-	id int(11) not null primary key auto_increment comment 'ID',
-	role_id int not null comment '角色ID',
-	constraint fk_role_id foreign key (role_id) references mho_skywalker_role(role_id),
-	resource_id int not null comment '资源ID',
-	constraint fk_resource_id foreign key (resource_id) references mho_skywalker_resource(resource_id),
-	time_create datetime default current_timestamp comment '创建时间',
-	is_delete char default 0 comment '是否删除'
-);
-alter table mho_skywalker_role_resource add constraint role_resource_role_id_resource_id unique(role_id,resource_id);
-
 create table if not exists mho_skywalker_chat_room (
 	room_id int(11) not null primary key auto_increment comment '聊天室ID',
 	room_name varchar(255) not null comment '聊天室名称',
