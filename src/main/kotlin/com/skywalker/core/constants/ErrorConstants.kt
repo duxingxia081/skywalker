@@ -2,6 +2,16 @@ package com.skywalker.core.constants
 
 
 object ErrorConstants {
+    //错误码-成功
+    val SUCCESS_CODE_0 = "0"
+    //错误描述-上传成功
+    val SUCCESS_MSG_0= "成功"
+    //错误描述-上传成功
+    val SUCCESS_MSG_0_= "成功!不需要处理"
+    //错误码-其他错误
+    val ERROR_CODE_1 = "-1"
+    //错误描述-上传失败
+    val ERROR_MSG_1= "失败"
     //错误码-其他错误
     val ERROR_CODE_9999 = "-9999"
     //错误码-无权限
@@ -38,4 +48,8 @@ object ErrorConstants {
     val ERROR_CODE_1107 = "-1107"
     //错误描述-参数不能为空
     val ERROR_MSG_1107= "参数不能为空"
+    //错误码-更新信息失败
+    val ERROR_CODE_1108 = "-1108"
+    //错误描述-更新信息失败
+    val ERROR_MSG_1108= "更新信息失败"
 }

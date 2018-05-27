@@ -5,7 +5,7 @@ import java.util.*
 import javax.validation.constraints.NotBlank
 
 data class SkywalkerUserDTO(
-    var userId: Long? = 0L,
+    var userId: Long = 0L,
     @field:NotBlank(message = "用户名不能为空")
     var userName: String? = "",
     var mobilePhone: String? = "",

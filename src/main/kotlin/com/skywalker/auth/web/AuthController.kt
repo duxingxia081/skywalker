@@ -38,7 +38,7 @@ class AuthController(
     }
 
     data class AuthParams(
-        @field:NotBlank(message = "密码不能为空")
+        @field:NotBlank(message = "用户名不能为空")
         val userName: String,
         @field:NotBlank(message = "密码不能为空")
         val password: String
