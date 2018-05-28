@@ -3,8 +3,10 @@ package com.skywalker.auth.web
 import com.skywalker.auth.handler.TokenHandler
 import com.skywalker.auth.service.SecurityContextService
 import com.skywalker.core.constants.ErrorConstants
+import com.skywalker.core.constants.SuccessResponse
 import com.skywalker.core.exception.ServiceException
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.validation.BindingResult
@@ -24,17 +26,23 @@ class AuthController(
     private val securityContextService: SecurityContextService
 ) {
     @PostMapping
-    fun auth(@Valid @RequestBody params: AuthParams, result: BindingResult): AuthResponse {
+    fun auth(@Valid @RequestBody params: AuthParams, result: BindingResult): SuccessResponse {
         if (result.hasErrors()) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.getFieldErrors())
+            throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
-        val loginToken = UsernamePasswordAuthenticationToken(params.userName, params.password)
-        val authentication = authenticationManager.authenticate(loginToken)
-        SecurityContextHolder.getContext().authentication = authentication
+        try {
+            val loginToken = UsernamePasswordAuthenticationToken(params.userName, params.password)
+            val authentication = authenticationManager.authenticate(loginToken)
+            SecurityContextHolder.getContext().authentication = authentication
 
-        return securityContextService.currentUser()
-            .let { requireNotNull(it) }
-            .let { tokenHandler.createTokenForUser(it).let(::AuthResponse) }
+            return securityContextService.currentUser()
+                .let { requireNotNull(it) }
+                .let { tokenHandler.createTokenForUser(it).let(::SuccessResponse) }
+        } catch (e: BadCredentialsException) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1101, ErrorConstants.ERROR_MSG_1101)
+        }catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1109, ErrorConstants.ERROR_MSG_1109)
+        }
     }
 
     data class AuthParams(
@@ -43,7 +51,4 @@ class AuthController(
         @field:NotBlank(message = "密码不能为空")
         val password: String
     )
-
-    data class AuthResponse(val token: String)
-
 }

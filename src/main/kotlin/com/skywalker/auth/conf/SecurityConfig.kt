@@ -21,34 +21,34 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
-        private val userDetailsService: UserDetailsService,
-        private val statelessAuthenticationFilter: StatelessAuthenticationFilter
+    private val userDetailsService: UserDetailsService,
+    private val statelessAuthenticationFilter: StatelessAuthenticationFilter
 ) : WebSecurityConfigurerAdapter(true) {
     override fun configure(http: HttpSecurity) {
         try {
             http.csrf().disable()
 
             http
-                    .exceptionHandling().and()
-                    .anonymous().and()
-                    .servletApi().and()
-                    .headers().cacheControl()
+                .exceptionHandling().and()
+                .anonymous().and()
+                .servletApi().and()
+                .headers().cacheControl()
 
             http.authorizeRequests()
-                    .antMatchers(HttpMethod.GET, "/users/myinfo").hasRole("USER")
-                    .and()
+                .antMatchers(HttpMethod.GET, "/users/myinfo").hasRole("USER")
+                .and()
 
             http.addFilterBefore(statelessAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
         } catch (e: AccessDeniedException) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1001, ErrorConstants.ERROR_MSG_1001)
         } catch (e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_9999, e.message?:"访问权限系统错误")
+            throw ServiceException(ErrorConstants.ERROR_CODE_9999, e.message ?: "访问权限系统错误")
         }
     }
 
     @Bean
     override fun authenticationManagerBean(): AuthenticationManager =
-            super.authenticationManagerBean()
+        super.authenticationManagerBean()
 
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.userDetailsService(userDetailsService).passwordEncoder(BCryptPasswordEncoder())
