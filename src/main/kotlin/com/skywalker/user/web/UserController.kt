@@ -7,7 +7,6 @@ import com.skywalker.core.constants.SuccessResponse
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.utils.BaseTools
 import com.skywalker.user.dto.SkywalkerUserDTO
-import com.skywalker.user.dto.UserDTO
 import com.skywalker.user.service.UserService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.validation.BindingResult
@@ -41,15 +40,15 @@ class UserController(private val userService: UserService, private val jwtTokenU
         params.userId=userId
         return SuccessResponse(userService.update(params))
     }
-    @RequestMapping(value = "/myinfo", method = [(RequestMethod.GET)])
-    fun myInfo(request: HttpServletRequest): SuccessResponse {
+    @RequestMapping(value = "/myinfo", method = arrayOf(RequestMethod.GET))
+    private fun myInfo(request: HttpServletRequest): SuccessResponse {
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
             ErrorConstants.ERROR_CODE_1104,
             ErrorConstants.ERROR_MSG_1104
         )
         return SuccessResponse(userService.findById(userId))
     }
-    @RequestMapping(method = [(RequestMethod.POST)], value = "/headImg")
+    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/headImg")
     fun handleFileUpload(@RequestParam("file") file: MultipartFile?,request: HttpServletRequest): Any {
         if (null!=file&&!file.isEmpty) {
             //设置允许上传文件类型
