@@ -22,6 +22,14 @@ object ErrorConstants {
     val ERROR_CODE_1002 = "-1002"
     //错误描述-非法请求
     val ERROR_MSG_1002 = "非法请求"
+    //错误码-不支持的文件类型
+    val ERROR_CODE_1003 = "-1003"
+    //错误描述-不支持的文件类型
+    val ERROR_MSG_1003 = "不支持的文件类型"
+    //错误码-文件太大,超出限制
+    val ERROR_CODE_1004 = "-1004"
+    //错误描述-文件太大,超出限制
+    val ERROR_MSG_1004 = "文件太大,请上传小于1M的文件"
     //错误码-登录错误
     val ERROR_CODE_1101 = "-1101"
     //登录错误

@@ -22,6 +22,8 @@ import javax.validation.Valid
 class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil,private val baseTools: BaseTools) {
     @Value("\${app.img.head}")
     private val headImgPath: String=""
+    @Value("\${app.img.head.type}")
+    private val suffixList: String=""
 
     @PostMapping
     fun create(@Valid @RequestBody params: SkywalkerUserDTO, result: BindingResult): SuccessResponse {
@@ -50,6 +52,8 @@ class UserController(private val userService: UserService, private val jwtTokenU
     @RequestMapping(method = [(RequestMethod.POST)], value = "/headImg")
     fun handleFileUpload(@RequestParam("file") file: MultipartFile?,request: HttpServletRequest): Any {
         if (null!=file&&!file.isEmpty) {
+            //设置允许上传文件类型
+            baseTools.checkImgType(file,suffixList)
             try {
                 val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
                         ErrorConstants.ERROR_CODE_1104,
