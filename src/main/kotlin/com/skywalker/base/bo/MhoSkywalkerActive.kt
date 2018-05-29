@@ -9,15 +9,16 @@ import javax.persistence.Id
 data class MhoSkywalkerActive(
         @Id
         @GeneratedValue
-        var activeId: Long = 0L,
+        var activeId: Long = 0,
         var activeTitle: String = "",
-        var postUserId: Long = 0L,
+        var postUserId: Long = 0,
+        var typeId: Long = 0,
         var startAddressName: String? = "",
         var startAddressCoordinate: String? = "",
         var endAddressName: String? = "",
         var endAddressCoordinate: String? = "",
         var goTime: Date? = Date(),
-        var days: Long? = 0L,
+        var days: Long? = 0,
         var charge: String? = "",
         var content: String? = "",
         var coverImage: String? = "",

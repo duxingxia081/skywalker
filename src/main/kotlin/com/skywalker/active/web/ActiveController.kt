@@ -1,9 +1,9 @@
 package com.skywalker.active.web
 
+import com.skywalker.active.dto.ActiveDTO
 import com.skywalker.active.dto.ActiveTypeDTO
 import com.skywalker.active.service.ActiveService
 import com.skywalker.active.service.ActiveTypeService
-import com.skywalker.base.bo.ActiveDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.*
@@ -17,13 +17,13 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
         return activeTypeService.list()
     }
 
-    @GetMapping("/{activeType}/activities")
+    @GetMapping("/{typeId}/activities")
     fun list(
             @RequestParam(value = "page", required = false) page: Int?,
             @RequestParam(value = "size", required = false) size: Int?,
-            @PathVariable typeId: Int?
+            @PathVariable typeId: Long?
     ): Page<ActiveDTO>? {
         val pageable = PageRequest(page ?: 0, size ?: 5)
-        return activeService.listAllByTypeId(2L, pageable)
+        return activeService.listAllByTypeId(typeId, pageable)
     }
 }

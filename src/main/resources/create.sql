@@ -145,6 +145,8 @@ create table if not exists mho_skywalker_active (
 	active_title varchar(100) not null comment '活动标题',
 	post_user_id int not null comment '发布者ID',
 	constraint fk_active_post_user_id foreign key (post_user_id) references mho_skywalker_user(user_id),
+	type_id int(11) not null comment '活动类型ID',
+	constraint fk_active_type_id foreign key (type_id) references mho_skywalker_active_type(type_id),
 	start_address_name varchar(255) comment '活动开始地点名称',
 	start_address_coordinate varchar(255) comment '活动开始地点坐标',
 	end_address_name varchar(255) comment '活动目的地地点名称',

@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 
 interface ActiveRepository : JpaRepository<MhoSkywalkerActive, Long> {
-    @Query("select f.activeId,f.activeTitle,f.postUserId,f.startAddressName,f.startAddressCoordinate,f.endAddressName,f.endAddressCoordinate,f.goTime,f.days,f.charge,f.content,f.coverImage from com.skywalker.active.dto.ActiveDTO f where f.postUserId=?1")
+    @Query("select new com.skywalker.active.dto.ActiveDTO(f.activeId,f.activeTitle,f.postUserId,f.typeId,f.startAddressName,f.startAddressCoordinate,f.endAddressName,f.endAddressCoordinate,f.goTime,f.days,f.charge,f.content,f.coverImage,u.userName,u.nickname,u.headImage,t.typeName) from MhoSkywalkerActive f,MhoSkywalkerUser u,MhoSkywalkerActiveType t where f.postUserId=u.userId and f.typeId=f.typeId and f.typeId=?1")
     fun listAllByTypeId(typeId: Long, pageable: Pageable): Page<ActiveDTO>
 }
