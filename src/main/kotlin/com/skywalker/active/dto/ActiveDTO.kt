@@ -1,4 +1,4 @@
-package com.skywalker.base.bo
+package com.skywalker.active.dto
 
 import java.util.*
 
@@ -14,6 +14,8 @@ data class ActiveDTO(
         val days: Long,
         val charge: String,
         val content: String,
-        val coverImage: String,
-        var total: Long
+        val coverImage: String
 )
+{
+        private var total: Long = 0
+}

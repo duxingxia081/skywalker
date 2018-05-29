@@ -1,7 +1,7 @@
 package com.skywalker.active.service
 
+import com.skywalker.active.dto.ActiveDTO
 import com.skywalker.active.repository.ActiveRepository
-import com.skywalker.base.bo.ActiveDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
