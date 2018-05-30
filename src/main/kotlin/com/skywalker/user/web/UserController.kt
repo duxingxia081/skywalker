@@ -61,7 +61,7 @@ class UserController(private val userService: UserService, private val jwtTokenU
                 val fileName = userId.toString()+"."+file.originalFilename!!.substringAfterLast(".")
                 baseTools.upLoad(file,headImgPath,fileName)
                 return SuccessResponse(
-                    "heads/$fileName"
+                    "img/heads/$fileName"
                 )
             } catch (e: IOException) {
                 throw ServiceException(ErrorConstants.ERROR_CODE_1,ErrorConstants.ERROR_MSG_1)
