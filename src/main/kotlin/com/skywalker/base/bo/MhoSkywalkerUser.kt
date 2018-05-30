@@ -10,21 +10,21 @@ import javax.persistence.Id
 @Entity
 @JsonIgnoreProperties(value = *arrayOf("hibernateLazyInitializer", "handler", "fieldHandler"))
 data class MhoSkywalkerUser constructor(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var userId: Long=0L,
-        var userName: String="",
-        var mobilePhone: String?="",
-        var wechatId: String?="",
-        var qqId: String?="",
-        var password: String="",
-        var nickname: String?="",
-        var sign: String?="",
-        var sex: String?="",
-        var address: String?="",
-        var qrCodeImage: String?="",
-        var headImage: String?="",
-        var coverImage: String?="",
-        var timeCreate: Date?=Date(),
-        var isDelete: String?="N"
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var userId: Long = 0L,
+    var userName: String = "",
+    var mobilePhone: String? = null,
+    var wechatId: String? = null,
+    var qqId: String? = null,
+    var password: String = "",
+    var nickname: String? = null,
+    var sign: String? = null,
+    var sex: String? = null,
+    var address: String? = null,
+    var qrCodeImage: String? = null,
+    var headImage: String? = null,
+    var coverImage: String? = null,
+    var timeCreate: Date? = null,
+    var isDelete: String? = null
 )

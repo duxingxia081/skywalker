@@ -3,7 +3,7 @@ package com.skywalker.auth.web
 import com.skywalker.auth.handler.TokenHandler
 import com.skywalker.auth.service.SecurityContextService
 import com.skywalker.core.constants.ErrorConstants
-import com.skywalker.core.constants.SuccessResponse
+import com.skywalker.core.response.SuccessResponse
 import com.skywalker.core.exception.ServiceException
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException

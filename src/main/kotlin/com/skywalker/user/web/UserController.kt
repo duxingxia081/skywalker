@@ -2,8 +2,8 @@ package com.skywalker.user.web
 
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
-import com.skywalker.core.constants.ErrorResponse
-import com.skywalker.core.constants.SuccessResponse
+import com.skywalker.core.response.ErrorResponse
+import com.skywalker.core.response.SuccessResponse
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.utils.BaseTools
 import com.skywalker.user.dto.SkywalkerUserDTO
@@ -32,7 +32,7 @@ class UserController(private val userService: UserService, private val jwtTokenU
         return SuccessResponse(userService.create(params))
     }
     @PutMapping
-    fun update(@RequestBody params: SkywalkerUserDTO,request: HttpServletRequest): SuccessResponse{
+    fun update(@RequestBody params: SkywalkerUserDTO,request: HttpServletRequest): SuccessResponse {
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
                 ErrorConstants.ERROR_CODE_1104,
                 ErrorConstants.ERROR_MSG_1104

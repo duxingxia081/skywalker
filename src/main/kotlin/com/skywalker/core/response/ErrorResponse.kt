@@ -1,4 +1,4 @@
-package com.skywalker.core.constants
+package com.skywalker.core.response
 
 data class ErrorResponse(
     val code: String,

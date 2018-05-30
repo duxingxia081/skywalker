@@ -12,6 +12,6 @@ data class MhoSkywalkerActiveType(
         var typeId: Long = 0L,
         var typeName: String = "",
         var typeImage: String = "",
-        var timeCreate: Date = Date(),
-        var isDelete: String = ""
+        var timeCreate: Date? = null,
+        var isDelete: String? = null
 )
