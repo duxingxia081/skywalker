@@ -163,8 +163,8 @@ create table if not exists mho_skywalker_active_image (
 	active_image_id int(11) not null primary key auto_increment comment '活动图片ID',
 	active_id int not null comment '活动ID',
 	constraint fk_active_image_active_id foreign key (active_id) references mho_skywalker_active(active_id),
-	image_name varchar(255) not null comment '游记图片名称',
-	image_url varchar(255) not null comment '游记图片地址',
+	image_name varchar(255) not null comment '活动图片名称',
+	image_url varchar(255) not null comment '活动图片地址',
 	time_create datetime default current_timestamp comment '创建时间',
 	is_delete char default 0 comment '是否删除'
 );
