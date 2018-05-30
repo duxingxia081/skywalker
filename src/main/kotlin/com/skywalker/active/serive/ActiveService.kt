@@ -23,13 +23,17 @@ class ActiveService(
         if (null == typeId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }
-        val list = activeRepository.listAllByTypeId(typeId, pageable)
-        if (null != list && !CollectionUtils.isEmpty(list.content)) {
-            for (active in list.content) {
-                active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
-                active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
+        try {
+            val list = activeRepository.listAllByTypeId(typeId, pageable)
+            if (null != list && !CollectionUtils.isEmpty(list.content)) {
+                for (active in list.content) {
+                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
+                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
+                }
             }
+            return list
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110)
         }
-        return list
     }
 }

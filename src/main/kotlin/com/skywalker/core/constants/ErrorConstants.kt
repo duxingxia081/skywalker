@@ -64,4 +64,8 @@ object ErrorConstants {
     val ERROR_CODE_1109 = "-1109"
     //登录失败
     val ERROR_MSG_1109 = "登录失败"
+    //错误码-列表加载失败
+    val ERROR_CODE_1110 = "-1110"
+    //列表加载失败
+    val ERROR_MSG_1110 = "列表加载失败"
 }
