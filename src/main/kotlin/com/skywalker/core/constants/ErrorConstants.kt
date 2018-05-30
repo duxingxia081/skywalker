@@ -67,5 +67,5 @@ object ErrorConstants {
     //错误码-列表加载失败
     val ERROR_CODE_1110 = "-1110"
     //列表加载失败
-    val ERROR_MSG_1110 = "列表加载失败"
+    val ERROR_MSG_1110 = "信息加载失败"
 }

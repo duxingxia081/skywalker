@@ -40,9 +40,9 @@ class SecurityConfig(
 
             http.addFilterBefore(statelessAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
         } catch (e: AccessDeniedException) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1001, ErrorConstants.ERROR_MSG_1001)
+            throw ServiceException(ErrorConstants.ERROR_CODE_1001, ErrorConstants.ERROR_MSG_1001,e)
         } catch (e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_9999, e.message ?: "访问权限系统错误")
+            throw ServiceException(ErrorConstants.ERROR_CODE_9999, e.message ?: "访问权限系统错误",e)
         }
     }
 

@@ -39,9 +39,9 @@ class AuthController(
                 .let { requireNotNull(it) }
                 .let { tokenHandler.createTokenForUser(it).let(::SuccessResponse) }
         } catch (e: BadCredentialsException) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1101, ErrorConstants.ERROR_MSG_1101)
+            throw ServiceException(ErrorConstants.ERROR_CODE_1101, ErrorConstants.ERROR_MSG_1101,e)
         }catch (e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1109, ErrorConstants.ERROR_MSG_1109)
+            throw ServiceException(ErrorConstants.ERROR_CODE_1109, ErrorConstants.ERROR_MSG_1109,e)
         }
     }
 

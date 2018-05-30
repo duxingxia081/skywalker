@@ -67,7 +67,7 @@ class UserController(private val userService: UserService, private val jwtTokenU
                     "img/heads/$fileName"
                 )
             } catch (e: IOException) {
-                throw ServiceException(ErrorConstants.ERROR_CODE_1,ErrorConstants.ERROR_MSG_1)
+                throw ServiceException(ErrorConstants.ERROR_CODE_1,ErrorConstants.ERROR_MSG_1,e)
             }
 
         } else {

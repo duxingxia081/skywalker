@@ -177,6 +177,15 @@ create table if not exists mho_skywalker_active_user (
 	time_create datetime default current_timestamp comment '创建时间',
 	is_delete char default 0 comment '是否删除'
 );
-
+create table if not exists mho_skywalker_active_leave_message (
+	leave_message_id int(11) not null primary key auto_increment comment '留言Id',
+	active_id int not null comment '活动ID',
+	constraint fk_active_leave_message_active_id foreign key (active_id) references mho_skywalker_active(active_id),
+	user_id int not null comment '用户ID',
+	constraint fk_active_leave_message_user_id foreign key (user_id) references mho_skywalker_user(user_id),
+	content varchar(255) not null comment '留言内容',
+	time_create datetime default current_timestamp comment '创建时间',
+	is_delete char default 0 comment '是否删除'
+);
 insert into mho_skywalker_role (role_id, role_name) values (1, 'ROLE_ADMIN');
 insert into mho_skywalker_role (role_id, role_name) values (2, 'ROLE_USER');

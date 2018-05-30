@@ -16,7 +16,11 @@ class ServiceException : Exception {
         this.errorKey = errorKey
         this.value = message
     }
-
+    constructor(errorKey: String, message: String,e:Exception) : super(message) {
+        e.printStackTrace()
+        this.errorKey = errorKey
+        this.value = message
+    }
     constructor(errorKey: String, fieldErrors: List<FieldError>){
         this.errorKey = errorKey
         val sb = StringBuffer()

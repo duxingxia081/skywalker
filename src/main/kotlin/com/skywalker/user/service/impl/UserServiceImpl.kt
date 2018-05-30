@@ -33,7 +33,7 @@ class UserServiceImpl(
             user.password = encrypt(user.password)?:""
             userRepository.save(user)
         } catch(e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1103, ErrorConstants.ERROR_MSG_1103)
+            throw ServiceException(ErrorConstants.ERROR_CODE_1103, ErrorConstants.ERROR_MSG_1103,e)
         }
         return userDto
     }
@@ -47,7 +47,7 @@ class UserServiceImpl(
                     headImage = userDto.headImage?:user.headImage,
                     password = encrypt(userDto.password)?:user.password))
         } catch(e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1108, ErrorConstants.ERROR_MSG_1108)
+            throw ServiceException(ErrorConstants.ERROR_CODE_1108, ErrorConstants.ERROR_MSG_1108,e)
         }
         return userDto
     }
