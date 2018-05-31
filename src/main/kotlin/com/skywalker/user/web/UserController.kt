@@ -1,20 +1,19 @@
 package com.skywalker.user.web
 
-import ch.qos.logback.core.util.DatePatternToRegexUtil
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
+import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.response.ErrorResponse
 import com.skywalker.core.response.SuccessResponse
-import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.utils.BaseTools
 import com.skywalker.user.dto.SkywalkerUserDTO
 import com.skywalker.user.service.UserService
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.format.datetime.DateFormatter
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
@@ -61,7 +60,8 @@ class UserController(private val userService: UserService, private val jwtTokenU
                         ErrorConstants.ERROR_CODE_1104,
                         ErrorConstants.ERROR_MSG_1104
                 )
-                val fileName = userId.toString()+"."+file.originalFilename!!.substringAfterLast(".")
+                var date = SimpleDateFormat("yyyyMMdd").format(Date())
+                val fileName = date+userId.toString()+"."+file.originalFilename!!.substringAfterLast(".")
                 baseTools.upLoad(file,headImgPath,fileName)
                 return SuccessResponse(
                     "img/heads/$fileName"

@@ -1,9 +1,7 @@
 package com.skywalker.base.bo
 
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 data class MhoSkywalkerActiveType(
@@ -12,6 +10,7 @@ data class MhoSkywalkerActiveType(
         var typeId: Long = 0L,
         var typeName: String = "",
         var typeImage: String = "",
+        @Temporal(TemporalType.TIMESTAMP)
         var timeCreate: Date? = null,
         var isDelete: String? = null
 )

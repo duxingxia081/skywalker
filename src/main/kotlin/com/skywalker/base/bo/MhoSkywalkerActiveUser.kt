@@ -1,9 +1,7 @@
 package com.skywalker.base.bo
 
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 data class MhoSkywalkerActiveUser(
@@ -12,6 +10,7 @@ data class MhoSkywalkerActiveUser(
         var id: Long,
         var activeId: Long,
         var userId: Long,
+        @Temporal(TemporalType.TIMESTAMP)
         var timeCreate: Date,
         var isDelete: String
 )

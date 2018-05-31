@@ -2,10 +2,7 @@ package com.skywalker.base.bo
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.util.*
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
 @JsonIgnoreProperties(value = *arrayOf("hibernateLazyInitializer", "handler", "fieldHandler"))
@@ -25,6 +22,7 @@ data class MhoSkywalkerUser constructor(
     var qrCodeImage: String? = null,
     var headImage: String? = null,
     var coverImage: String? = null,
+    @Temporal(TemporalType.TIMESTAMP)
     var timeCreate: Date? = null,
     var isDelete: String? = null
 )
