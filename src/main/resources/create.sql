@@ -183,7 +183,7 @@ create table if not exists mho_skywalker_active_leave_message (
 	constraint fk_active_leave_message_active_id foreign key (active_id) references mho_skywalker_active(active_id),
 	user_id int not null comment '用户ID',
 	constraint fk_active_leave_message_user_id foreign key (user_id) references mho_skywalker_user(user_id),
-	parent_leave_message_id int comment '父留言ID',
+	parent_leave_message_id int(11) comment '父留言ID',
 	content varchar(255) not null comment '留言内容',
 	time_create datetime default current_timestamp comment '创建时间',
 	is_delete char default 0 comment '是否删除'

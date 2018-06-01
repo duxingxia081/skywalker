@@ -11,7 +11,7 @@ object ErrorConstants {
     //错误码-其他错误
     val ERROR_CODE_1 = "-1"
     //错误描述-上传失败
-    val ERROR_MSG_1= "失败"
+    val ERROR_MSG_1= "操作失败！请稍后再试"
     //错误码-其他错误
     val ERROR_CODE_9999 = "-9999"
     //错误码-无权限
@@ -62,10 +62,14 @@ object ErrorConstants {
     val ERROR_MSG_1108= "更新信息失败"
     //错误码-登录失败
     val ERROR_CODE_1109 = "-1109"
-    //登录失败
+    //错误描述-登录失败
     val ERROR_MSG_1109 = "登录失败"
     //错误码-列表加载失败
     val ERROR_CODE_1110 = "-1110"
-    //列表加载失败
+    //错误描述-列表加载失败
     val ERROR_MSG_1110 = "信息加载失败"
+    //错误码-已经存在
+    val ERROR_CODE_1111 = "-1111"
+    //错误描述-已经存在
+    val ERROR_MSG_1111 = "已经存在，禁止重复提交"
 }

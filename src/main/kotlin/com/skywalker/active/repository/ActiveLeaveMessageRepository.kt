@@ -10,4 +10,7 @@ import org.springframework.data.jpa.repository.Query
 interface ActiveLeaveMessageRepository : JpaRepository<MhoSkywalkerActiveLeaveMessage, Long> {
     @Query("select new com.skywalker.active.dto.ActiveLeaveMessageDTO(u.userName,u.nickname,u.headImage,m.content,m.timeCreate) from MhoSkywalkerActiveLeaveMessage m,MhoSkywalkerUser u where m.userId=u.userId and m.activeId=?1")
     fun listAllByActiveId(activeId: Long, pageable: Pageable): Page<ActiveLeaveMessageDTO>
+
+    @Query("select m from MhoSkywalkerActiveLeaveMessage m,MhoSkywalkerUser u where m.userId=u.userId and m.activeId=?1 and m.parentLeaveMessageId=null")
+    fun listAllParentByActiveId(activeId: Long, pageable: Pageable): Page<MhoSkywalkerActiveLeaveMessage>
 }

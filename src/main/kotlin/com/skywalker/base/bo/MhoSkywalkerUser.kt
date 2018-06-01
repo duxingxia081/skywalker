@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 @JsonIgnoreProperties(value = *arrayOf("hibernateLazyInitializer", "handler", "fieldHandler"))
-data class MhoSkywalkerUser constructor(
+data class MhoSkywalkerUser(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var userId: Long = 0L,

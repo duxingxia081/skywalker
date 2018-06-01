@@ -2,8 +2,7 @@ package com.skywalker.auth.service.impl
 
 import com.skywalker.auth.service.SecurityContextService
 import com.skywalker.base.bo.MhoSkywalkerUser
-import com.skywalker.base.bo.UserDetailsImpl
-import org.slf4j.LoggerFactory
+import com.skywalker.user.service.impl.UserDetailsImpl
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 

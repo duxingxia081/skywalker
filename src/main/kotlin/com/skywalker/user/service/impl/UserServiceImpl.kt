@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 import javax.validation.Validator
 
 @Service
@@ -31,6 +32,7 @@ class UserServiceImpl(
             user = MhoSkywalkerUser()
             BeanUtils.copyProperties(userDto, user)
             user.password = encrypt(user.password)?:""
+            user.timeCreate = Date()
             userRepository.save(user)
         } catch(e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1103, ErrorConstants.ERROR_MSG_1103,e)

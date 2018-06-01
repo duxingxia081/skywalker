@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.Query
 interface ActiveUserRepository : JpaRepository<MhoSkywalkerActiveUser, Long> {
     @Query("select new com.skywalker.active.dto.ActiveUserDTO(u.userId,u.nickname,u.headImage) from MhoSkywalkerUser u,MhoSkywalkerActiveUser au where u.userId=au.userId and au.activeId=?1")
     fun listAllByActiveId(activeId: Long): List<ActiveUserDTO>?
+    @Query("from MhoSkywalkerActiveUser au where au.userId=?2 and au.activeId=?1")
+    fun findByActiveIdAndUserId(activeId: Long,userId:Long): MhoSkywalkerActiveUser?
 }

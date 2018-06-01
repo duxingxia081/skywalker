@@ -2,8 +2,8 @@ package com.skywalker.auth.handler.impl
 
 import com.skywalker.auth.handler.TokenHandler
 import com.skywalker.base.bo.MhoSkywalkerUser
-import com.skywalker.base.bo.UserDetailsImpl
 import com.skywalker.user.repository.UserRepository
+import com.skywalker.user.service.impl.UserDetailsImpl
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value

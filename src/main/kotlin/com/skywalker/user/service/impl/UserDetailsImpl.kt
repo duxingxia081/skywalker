@@ -1,4 +1,4 @@
-package com.skywalker.base.bo
+package com.skywalker.user.service.impl
 
 import com.skywalker.base.bo.MhoSkywalkerUser
 import org.springframework.security.core.GrantedAuthority
