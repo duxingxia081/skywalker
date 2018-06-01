@@ -14,7 +14,6 @@ data class MhoSkywalkerActiveLeaveMessage(
         var userId: Long = 0,
         var parentLeaveMessageId: Long? = null,
         var content: String? = null,
-        @Temporal(TemporalType.TIMESTAMP)
         var timeCreate: Date? = null,
         @ManyToOne(cascade = arrayOf(CascadeType.ALL))
         @JoinColumn(name = "userId", insertable = false, updatable = false)
