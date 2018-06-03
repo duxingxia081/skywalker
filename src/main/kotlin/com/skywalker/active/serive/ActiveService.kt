@@ -5,10 +5,14 @@ import com.skywalker.active.repository.ActiveImgRepository
 import com.skywalker.active.repository.ActiveLeaveMessageRepository
 import com.skywalker.active.repository.ActiveRepository
 import com.skywalker.active.repository.ActiveUserRepository
+import com.skywalker.base.bo.MhoSkywalkerActive
 import com.skywalker.base.bo.MhoSkywalkerActiveLeaveMessage
 import com.skywalker.base.bo.MhoSkywalkerActiveUser
+import com.skywalker.base.bo.MhoSkywalkerUser
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
+import org.springframework.beans.BeanUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -24,6 +28,12 @@ class ActiveService(
         private val activeImgRepository: ActiveImgRepository,
         private val activeLeaveMessageRepository: ActiveLeaveMessageRepository
 ) {
+
+    @Value("\${app.active.create.times}")
+    private val activeCteateTimes: Long=0L
+    /**
+     * 加入活动
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     fun create(activeId: Long, userId: Long): String {
 
@@ -43,6 +53,9 @@ class ActiveService(
         return "成功"
     }
 
+    /**
+     * 留言
+     */
     @Transactional(propagation = Propagation.REQUIRED)
     fun createMsg(activeId: Long, userId: Long, parentLeaveMessageId: Long?, content: String): String {
         try {
@@ -59,6 +72,9 @@ class ActiveService(
         return "成功"
     }
 
+    /**
+     * 活动列表
+     */
     @Transactional(readOnly = true)
     fun listAllByTypeId(typeId: Long?, pageable: Pageable): Page<ActiveDTO>? {
         if (null == typeId) {
@@ -68,8 +84,8 @@ class ActiveService(
             val list = activeRepository.listAllByTypeId(typeId, pageable)
             if (null != list && !CollectionUtils.isEmpty(list.content)) {
                 for (active in list.content) {
-                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
-                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
+                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId!!)
+                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId!!)
                 }
             }
             return list
@@ -78,8 +94,11 @@ class ActiveService(
         }
     }
 
+    /**
+     * 活动详情
+     */
     @Transactional(readOnly = true)
-    fun listAllByActiveId(activeId: Long?): ActiveDTO? {
+    fun findByActiveId(activeId: Long?): ActiveDTO? {
         if (null == activeId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }
@@ -95,6 +114,9 @@ class ActiveService(
         }
     }
 
+    /**
+     * 留言列表
+     */
     @Transactional(readOnly = true)
     fun listActiveMsgByActiveId(activeId: Long?, pageable: Pageable): Page<MhoSkywalkerActiveLeaveMessage>? {
         if (null == activeId) {
@@ -105,5 +127,30 @@ class ActiveService(
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }
+    }
+
+    /**
+     * 添加活动
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    fun create(activeDTO: ActiveDTO): ActiveDTO {
+
+        //当前时间减去1天
+        var preDate = Date(Date().time-24*60*60*1000)
+        var list = activeRepository.listActiveByUserId(activeDTO.postUserId!!,preDate)
+        if(!CollectionUtils.isEmpty(list)&&list.size>=activeCteateTimes)
+        {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1112, ErrorConstants.ERROR_MSG_1112+activeCteateTimes+"次")
+        }
+
+        try {
+            var active = MhoSkywalkerActive()
+            BeanUtils.copyProperties(activeDTO, active)
+            active.timeCreate = Date()
+            activeRepository.save(active)
+        } catch(e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113,e)
+        }
+        return activeDTO
     }
 }

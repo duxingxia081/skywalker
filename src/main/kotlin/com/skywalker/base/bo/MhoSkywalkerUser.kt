@@ -23,6 +23,5 @@ data class MhoSkywalkerUser(
     var headImage: String? = null,
     var coverImage: String? = null,
     @Temporal(TemporalType.TIMESTAMP)
-    var timeCreate: Date? = null,
-    var isDelete: String? = null
+    var timeCreate: Date? = null
 )

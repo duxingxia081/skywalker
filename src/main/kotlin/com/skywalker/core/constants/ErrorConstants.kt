@@ -72,4 +72,12 @@ object ErrorConstants {
     val ERROR_CODE_1111 = "-1111"
     //错误描述-已经存在
     val ERROR_MSG_1111 = "已经存在，禁止重复提交"
+    //错误码-超过每天发布活动次数
+    val ERROR_CODE_1112 = "-1112"
+    //错误描述-超过24小时内发布活动次数
+    val ERROR_MSG_1112 = "超过24小时内发布活动次数"
+    //错误码-新增失败
+    val ERROR_CODE_1113 = "-1113"
+    //错误描述-新增失败
+    val ERROR_MSG_1113= "新增失败"
 }

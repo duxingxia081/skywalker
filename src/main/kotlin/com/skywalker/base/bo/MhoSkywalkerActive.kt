@@ -1,12 +1,14 @@
 package com.skywalker.base.bo
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.util.*
 import javax.persistence.*
 
 @Entity
+@JsonIgnoreProperties(value = *arrayOf("hibernateLazyInitializer", "handler", "fieldHandler"))
 data class MhoSkywalkerActive(
         @Id
-        @GeneratedValue
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         var activeId: Long = 0,
         var activeTitle: String = "",
         var postUserId: Long = 0,
@@ -22,6 +24,5 @@ data class MhoSkywalkerActive(
         var content: String? = null,
         var coverImage: String? = null,
         @Temporal(TemporalType.TIMESTAMP)
-        var timeCreate: Date? = null,
-        var isDelete: String? = null
+        var timeCreate: Date? = null
 )
