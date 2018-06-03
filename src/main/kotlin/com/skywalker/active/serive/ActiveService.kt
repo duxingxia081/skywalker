@@ -5,10 +5,7 @@ import com.skywalker.active.repository.ActiveImgRepository
 import com.skywalker.active.repository.ActiveLeaveMessageRepository
 import com.skywalker.active.repository.ActiveRepository
 import com.skywalker.active.repository.ActiveUserRepository
-import com.skywalker.base.bo.MhoSkywalkerActive
-import com.skywalker.base.bo.MhoSkywalkerActiveLeaveMessage
-import com.skywalker.base.bo.MhoSkywalkerActiveUser
-import com.skywalker.base.bo.MhoSkywalkerUser
+import com.skywalker.base.bo.*
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import org.springframework.beans.BeanUtils
@@ -152,5 +149,20 @@ class ActiveService(
             throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113,e)
         }
         return activeDTO
+    }
+    /**
+     * 添加活动图片
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    fun createActiveImg(activeId: Long,imageName:String,imageUrl: String){
+        try {
+            var img = MhoSkywalkerActiveImage()
+            img.activeId=activeId
+            img.imageName=imageName
+            img.imageUrl=imageUrl
+            activeImgRepository.save(img)
+        } catch(e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113,e)
+        }
     }
 }

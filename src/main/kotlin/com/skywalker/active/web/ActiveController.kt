@@ -7,11 +7,18 @@ import com.skywalker.active.service.ActiveTypeService
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
+import com.skywalker.core.response.ErrorResponse
 import com.skywalker.core.response.SuccessResponse
+import com.skywalker.core.utils.BaseTools
 import org.hibernate.validator.constraints.Length
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
+import org.springframework.util.CollectionUtils
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import java.io.IOException
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
@@ -20,6 +27,11 @@ import javax.validation.constraints.NotBlank
 
 @RestController
 class ActiveController(private val activeTypeService: ActiveTypeService, private val activeService: ActiveService, private val jwtTokenUtil: JwtTokenUtil) {
+    @Value("\${app.img.activity}")
+    private val activeImgPath: String = ""
+    @Value("\${app.img.head.type}")
+    private val suffixList: String = ""
+
     /**
      * 活动类型
      */
@@ -123,25 +135,31 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
                 ErrorConstants.ERROR_CODE_1104,
                 ErrorConstants.ERROR_MSG_1104
         )
-        params.postUserId=userId
+        params.postUserId = userId
         return SuccessResponse(activeService.create(params))
     }
-    data class ActiveParams(
-            @field:NotBlank(message = "活动类型不能为空")
-            val typeId: Long,
-            @field:NotBlank(message = "活动标题不能为空")
-            val activeTitle: String,
-            @field:NotBlank(message = "出发地不能为空")
-            val startAddressName: String,
-            @field:NotBlank(message = "目的地不能为空")
-            val endAddressName: String,
-            @field:NotBlank(message = "出发日期不能为空")
-            val goTime: Date,
-            @field:NotBlank(message = "活动耗时不能为空")
-            val days: Long,
-            @field:NotBlank(message = "费用不能为空")
-            val charge: String,
-            @field:NotBlank(message = "活动内容不能为空")
-            val content: String
-    )
+
+    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/activity/{activeId}/activityImg")
+    fun handleFileUpload(@RequestParam("file") list: List<MultipartFile>, @PathVariable activeId: Long, request: HttpServletRequest): Any {
+        if (!CollectionUtils.isEmpty(list)) {
+            try {
+                for (file in list) {
+                    //设置允许上传文件类型
+                    BaseTools.checkImgType(file, suffixList)
+                    val fileName = activeId.toString() + "." + file.originalFilename!!.substringAfterLast(".")
+                    val name = BaseTools.upLoad(file, activeImgPath, fileName)
+                    activeService.createActiveImg(activeId, name, "img/heads/$name")
+                }
+                return SuccessResponse("成功")
+            } catch (e: IOException) {
+                throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
+            }
+
+        } else {
+            return ErrorResponse(
+                    ErrorConstants.SUCCESS_CODE_0,
+                    ErrorConstants.SUCCESS_MSG_0_
+            )
+        }
+    }
 }

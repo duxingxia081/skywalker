@@ -13,14 +13,12 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/users")
-class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil,private val baseTools: BaseTools) {
+class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil) {
     @Value("\${app.img.head}")
     private val headImgPath: String=""
     @Value("\${app.img.head.type}")
@@ -54,17 +52,16 @@ class UserController(private val userService: UserService, private val jwtTokenU
     fun handleFileUpload(@RequestParam("file") file: MultipartFile?,request: HttpServletRequest): Any {
         if (null!=file&&!file.isEmpty) {
             //设置允许上传文件类型
-            baseTools.checkImgType(file,suffixList)
+            BaseTools.checkImgType(file,suffixList)
             try {
                 val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
                         ErrorConstants.ERROR_CODE_1104,
                         ErrorConstants.ERROR_MSG_1104
                 )
-                var date = SimpleDateFormat("yyyyMMdd").format(Date())
-                val fileName = date+userId.toString()+"."+file.originalFilename!!.substringAfterLast(".")
-                baseTools.upLoad(file,headImgPath,fileName)
+                val fileName = userId.toString()+"."+file.originalFilename!!.substringAfterLast(".")
+                val name = BaseTools.upLoad(file,headImgPath,fileName)
                 return SuccessResponse(
-                    "img/heads/$fileName"
+                    "img/heads/$name"
                 )
             } catch (e: IOException) {
                 throw ServiceException(ErrorConstants.ERROR_CODE_1,ErrorConstants.ERROR_MSG_1,e)

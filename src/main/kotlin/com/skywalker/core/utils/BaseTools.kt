@@ -7,15 +7,18 @@ import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.text.SimpleDateFormat
+import java.util.*
 
-@Component
-class BaseTools {
+object BaseTools {
     /**
      * 上传
      */
-    fun upLoad(file: MultipartFile, path: String,fileName:String)
+    fun upLoad(file: MultipartFile, path: String,fileName:String):String
     {
-        Files.copy(file.inputStream, Paths.get(path, fileName), StandardCopyOption.REPLACE_EXISTING)
+        val name = SimpleDateFormat("yyyyMMdd").format(Date())+Random().nextInt()+fileName
+        Files.copy(file.inputStream, Paths.get(path, name), StandardCopyOption.REPLACE_EXISTING)
+        return name
     }
 
     /**
@@ -28,5 +31,4 @@ class BaseTools {
             throw ServiceException(ErrorConstants.ERROR_CODE_1003,ErrorConstants.ERROR_MSG_1003+",只支持$suffixList")
         }
     }
-
 }
