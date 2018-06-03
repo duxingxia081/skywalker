@@ -5,7 +5,11 @@ import com.skywalker.active.repository.ActiveImgRepository
 import com.skywalker.active.repository.ActiveLeaveMessageRepository
 import com.skywalker.active.repository.ActiveRepository
 import com.skywalker.active.repository.ActiveUserRepository
-import com.skywalker.base.bo.*
+import com.skywalker.active.repository.impl.ActiveRepositoryImpl
+import com.skywalker.base.bo.MhoSkywalkerActive
+import com.skywalker.base.bo.MhoSkywalkerActiveImage
+import com.skywalker.base.bo.MhoSkywalkerActiveLeaveMessage
+import com.skywalker.base.bo.MhoSkywalkerActiveUser
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import org.springframework.beans.BeanUtils
@@ -18,12 +22,14 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.CollectionUtils
 import java.util.*
 
+
 @Service
 class ActiveService(
         private val activeRepository: ActiveRepository,
         private val activeUserRepository: ActiveUserRepository,
         private val activeImgRepository: ActiveImgRepository,
-        private val activeLeaveMessageRepository: ActiveLeaveMessageRepository
+        private val activeLeaveMessageRepository: ActiveLeaveMessageRepository,
+        private val activeRepositoryImpl: ActiveRepositoryImpl
 ) {
 
     @Value("\${app.active.create.times}")
@@ -165,4 +171,51 @@ class ActiveService(
             throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113,e)
         }
     }
+
+    /**
+     * 活动列表
+     */
+    @Transactional(readOnly = true)
+    fun listAllByParam(params: ActiveDTO?, pageable: Pageable): List<ActiveDTO> {
+        if (null == params) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
+        }
+        try {
+            val list = activeRepositoryImpl.listAllByParam(params,pageable)
+            if (null != list && !CollectionUtils.isEmpty(list)) {
+                for (active in list) {
+                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
+                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
+                }
+            }
+            return list
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
+        }
+    }
+
+/*    *//**
+     * 活动列表
+     *//*
+    @Transactional(readOnly = true)
+    fun listAllByParam(params: ActiveDTO?, pageable: Pageable): Page<ActiveDTO>? {
+        try {
+            class mySpec : Specification<MhoSkywalkerActive> {
+                override fun toPredicate(root: Root<MhoSkywalkerActive>, criteriaQuery: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder): Predicate {
+
+                    val startAddressName: Path<String> = root["startAddressName"]
+                    //val p1 = criteriaBuilder.like(startAddressName,"%params.startAddressName%")
+                    val list = mutableListOf<Predicate>()
+                    with(criteriaBuilder) {
+                        params?.startAddressName.let { list.add(like(startAddressName, "%$params.startAddressName%")) }
+                    }
+                    return criteriaBuilder.and(*list.toTypedArray()) //这里将list先装换为array，然后再展开，涉及到list的varags
+                }
+            }
+
+            val list = activeRepository.findAll(mySpec(),pageable)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
+        }
+    }*/
 }

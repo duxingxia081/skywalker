@@ -18,7 +18,6 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
@@ -161,5 +160,25 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
                     ErrorConstants.SUCCESS_MSG_0_
             )
         }
+    }
+
+    /**
+     * 活动列表
+     */
+    @GetMapping("/activity")
+    fun listActivity(
+            @RequestParam(value = "page", required = false) page: Int?,
+            @RequestParam(value = "size", required = false) size: Int?,
+            @RequestParam(value = "startAddressName") startAddressName: String?,
+            @RequestParam(value = "endAddressName") endAddressName: String?,
+            @RequestParam(value = "goTime") goTime: String?
+    ): SuccessResponse {
+        val pageable = PageRequest(page ?: 0, size ?: 5)
+        var params = ActiveDTO()
+        params.startAddressName = startAddressName
+        params.endAddressName = endAddressName
+        val page = activeService.listAllByParam(params, pageable)
+        return SuccessResponse(page)
+
     }
 }
