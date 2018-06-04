@@ -38,8 +38,8 @@ class ActiveController(
      * 活动类型
      */
     @RequestMapping(value = "/activeType", method = arrayOf(RequestMethod.GET))
-    fun activeType(): MutableList<ActiveTypeDTO>? {
-        return activeTypeService.list()
+    fun activeType(): SuccessResponse {
+        return return SuccessResponse(activeTypeService.list())
     }
 
     /**
@@ -125,7 +125,7 @@ class ActiveController(
     )
 
     /**
-     * 活动
+     * 新增活动
      */
     @PostMapping("/activity")
     fun createActive(

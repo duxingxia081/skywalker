@@ -1,5 +1,13 @@
 package com.skywalker.core.web
 
+import com.baidu.yun.push.auth.PushKeyPair
+import com.baidu.yun.push.client.BaiduPushClient
+import com.baidu.yun.push.constants.BaiduPushConstants
+import com.baidu.yun.push.exception.PushClientException
+import com.baidu.yun.push.exception.PushServerException
+import com.baidu.yun.push.model.PushMsgToSingleDeviceRequest
+import com.skywalker.core.constants.BaiduConstants
+import net.sf.json.JSONObject
 import java.util.*
 
 
@@ -14,7 +22,7 @@ class BaiduPush {
     fun pushNotificationByUser(
         channelId: String,
         deviceType: Int?, message: String, map: Map<String, Any>?
-    ): Array<String> {
+    ): Array<String?> {
         val results = arrayOfNulls<String>(3)
         val retCode = "1"
         val retMsg = ""
@@ -23,11 +31,11 @@ class BaiduPush {
             var apiKey = ""
             var secretKey = ""
             if (deviceType != null && deviceType!!.toInt() == 4) {// ios
-                apiKey = Constants.baiduIOSApiKey
-                secretKey = Constants.baiduIOSSecretKey
+                apiKey = BaiduConstants.baiduIOSApiKey
+                secretKey = BaiduConstants.baiduIOSSecretKey
             } else if (deviceType == 3) {//Android
-                apiKey = Constants.baiduAndroidApiKey
-                secretKey = Constants.baiduAndroidSecretKey
+                apiKey = BaiduConstants.baiduAndroidApiKey
+                secretKey = BaiduConstants.baiduAndroidSecretKey
             }
             // 2. 创建PushKeyPair
             val pair = PushKeyPair(apiKey, secretKey)
@@ -38,11 +46,7 @@ class BaiduPush {
             )
 
             // 3. 注册YunLogHandler，获取本次请求的交互信息
-            pushClient.setChannelLogHandler(object : YunLogHandler() {
-                fun onHandle(event: YunLogEvent) {
-                    System.out.println(event.getMessage())
-                }
-            })
+            pushClient.setChannelLogHandler { event -> System.out.println(event.message) }
             val notification = JSONObject()
             if (deviceType == 4) {
                 val jsonAPS = JSONObject()
@@ -56,7 +60,7 @@ class BaiduPush {
                     val customContentMapKeys = map!!.keys
                     val irt = customContentMapKeys.iterator()
                     while (irt.hasNext()) {
-                        val key = irt.next() as String
+                        val key = irt.next()
                         val value = map!![key] as String
                         notification.put(key, value)
                     }
@@ -75,7 +79,7 @@ class BaiduPush {
                     val customContentMapKeys = map!!.keys
                     val irt = customContentMapKeys.iterator()
                     while (irt.hasNext()) {
-                        val key = irt.next() as String
+                        val key = irt.next()
                         val value = map!![key] as String
                         notification.put(key, value)
                     }
@@ -94,8 +98,8 @@ class BaiduPush {
 
             // 6. 认证推送成功
             System.out.println(
-                "msgId: " + response.getMsgId()
-                        + ",sendTime: " + response.getSendTime()
+                "msgId: " + response.msgId
+                        + ",sendTime: " + response.sendTime
             )
         } catch (e: PushClientException) {
             //ERROROPTTYPE 用于设置异常的处理方式 -- 抛出异常和捕获异常,
@@ -122,7 +126,7 @@ class BaiduPush {
                 println(
                     String.format(
                         "requestId: %d, errorCode: %d, errorMsg: %s",
-                        e.getRequestId(), e.getErrorCode(), e.getErrorMsg()
+                        e.requestId, e.errorCode, e.errorMsg
                     )
                 )
             }
@@ -132,15 +136,6 @@ class BaiduPush {
         }
 
         return results
-    }
-
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val baiduPush = BaiduPush()
-            val map = HashMap<String, Any>()
-            baiduPush.pushNotificationByUser("clientChannelId", 3, "今天天气不错", map)
-        }
     }
 
 }

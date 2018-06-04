@@ -22,7 +22,7 @@ class ActiveRepositoryImpl(
             sql += " and f.startAddressName like '%$startAddressName'"
         }
         if (null != endAddressName) {
-            sql += " and f.endAddressName =$endAddressName "
+            sql += " and f.endAddressName ='$endAddressName'"
         }
         if (null != goTime) {
             sql += " and date_format(f.goTime,'%Y-%m-%d') = '$goTime'"
