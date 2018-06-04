@@ -1,13 +1,12 @@
 package com.skywalker.active.web
 
-import com.skywalker.active.dto.ActiveDTO
 import com.skywalker.active.dto.ActiveTypeDTO
+import com.skywalker.active.form.ActiveForm
 import com.skywalker.active.service.ActiveService
 import com.skywalker.active.service.ActiveTypeService
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
-import com.skywalker.core.response.ErrorResponse
 import com.skywalker.core.response.SuccessResponse
 import com.skywalker.core.utils.BaseTools
 import org.hibernate.validator.constraints.Length
@@ -104,9 +103,9 @@ class ActiveController(
     @PostMapping("/activity/{activeId}/activityMsg")
     fun createMsg(
         @Valid @RequestBody params: MsgParams,
+        result: BindingResult,
         @PathVariable activeId: Long,
-        request: HttpServletRequest,
-        result: BindingResult
+        request: HttpServletRequest
     ): SuccessResponse {
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
@@ -130,9 +129,9 @@ class ActiveController(
      */
     @PostMapping("/activity")
     fun createActive(
-        @Valid @RequestBody params: ActiveDTO,
-        request: HttpServletRequest,
-        result: BindingResult
+        @Valid params: ActiveForm,
+        result: BindingResult,
+        request: HttpServletRequest
     ): SuccessResponse {
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
@@ -142,30 +141,25 @@ class ActiveController(
             ErrorConstants.ERROR_MSG_1104
         )
         params.postUserId = userId
-        return SuccessResponse(activeService.create(params))
+        val activeId = activeService.create(params)
+        fileUpload(params.file,activeId)
+        return SuccessResponse("成功")
     }
 
-    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/activity/{activeId}/activityImg")
-    fun handleFileUpload(@RequestParam("file") list: List<MultipartFile>, @PathVariable activeId: Long, request: HttpServletRequest): Any {
+    private fun fileUpload(list: List<MultipartFile>?,activeId: Long){
         if (!CollectionUtils.isEmpty(list)) {
             try {
-                for (file in list) {
+                for (file in list!!) {
                     //设置允许上传文件类型
                     BaseTools.checkImgType(file, suffixList)
                     val fileName = activeId.toString() + "." + file.originalFilename!!.substringAfterLast(".")
                     val name = BaseTools.upLoad(file, activeImgPath, fileName)
                     activeService.createActiveImg(activeId, name, "img/heads/$name")
                 }
-                return SuccessResponse("成功")
             } catch (e: IOException) {
                 throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
             }
 
-        } else {
-            return ErrorResponse(
-                ErrorConstants.SUCCESS_CODE_0,
-                ErrorConstants.SUCCESS_MSG_0_
-            )
         }
     }
 
@@ -181,15 +175,15 @@ class ActiveController(
         @RequestParam(value = "goTime") goTime: String?
     ): SuccessResponse {
         val pageable = PageRequest(page ?: 0, size ?: 5)
-        var params = ActiveFormParams(startAddressName,endAddressName,goTime)
+        var params = ActiveFormParams(startAddressName, endAddressName, goTime)
         val page = activeService.listAllByParam(params, pageable)
         return SuccessResponse(page)
 
     }
 
     data class ActiveFormParams(
-        val startAddressName: String?,
-        val endAddressName: String?,
-        val goTime: String?
+        var startAddressName: String? = null,
+        var endAddressName: String? = null,
+        var goTime: String? = null
     )
 }

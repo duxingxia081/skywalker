@@ -1,6 +1,7 @@
 package com.skywalker.active.service
 
 import com.skywalker.active.dto.ActiveDTO
+import com.skywalker.active.form.ActiveForm
 import com.skywalker.active.repository.ActiveImgRepository
 import com.skywalker.active.repository.ActiveLeaveMessageRepository
 import com.skywalker.active.repository.ActiveRepository
@@ -21,20 +22,22 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.CollectionUtils
+import java.text.SimpleDateFormat
 import java.util.*
 
 
 @Service
 class ActiveService(
-        private val activeRepository: ActiveRepository,
-        private val activeUserRepository: ActiveUserRepository,
-        private val activeImgRepository: ActiveImgRepository,
-        private val activeLeaveMessageRepository: ActiveLeaveMessageRepository,
-        private val activeRepositoryImpl: ActiveRepositoryImpl
+    private val activeRepository: ActiveRepository,
+    private val activeUserRepository: ActiveUserRepository,
+    private val activeImgRepository: ActiveImgRepository,
+    private val activeLeaveMessageRepository: ActiveLeaveMessageRepository,
+    private val activeRepositoryImpl: ActiveRepositoryImpl
 ) {
 
     @Value("\${app.active.create.times}")
-    private val activeCteateTimes: Long=0L
+    private val activeCteateTimes: Long = 0L
+
     /**
      * 加入活动
      */
@@ -51,7 +54,7 @@ class ActiveService(
             user.userId = userId
             user.timeCreate = Date()
             activeUserRepository.save(user)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
         }
         return "成功"
@@ -70,7 +73,7 @@ class ActiveService(
             msg.userId = userId
             msg.timeCreate = Date()
             activeLeaveMessageRepository.save(msg)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
         }
         return "成功"
@@ -137,39 +140,43 @@ class ActiveService(
      * 添加活动
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    fun create(activeDTO: ActiveDTO): ActiveDTO {
+    fun create(activeForm: ActiveForm): Long {
 
         //当前时间减去1天
-        var preDate = Date(Date().time-24*60*60*1000)
-        var list = activeRepository.listActiveByUserId(activeDTO.postUserId!!,preDate)
-        if(!CollectionUtils.isEmpty(list)&&list.size>=activeCteateTimes)
-        {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1112, ErrorConstants.ERROR_MSG_1112+activeCteateTimes+"次")
+        var preDate = Date(Date().time - 24 * 60 * 60 * 1000)
+        var list = activeRepository.listActiveByUserId(activeForm.postUserId, preDate)
+        if (!CollectionUtils.isEmpty(list) && list.size >= activeCteateTimes) {
+            throw ServiceException(
+                ErrorConstants.ERROR_CODE_1112,
+                ErrorConstants.ERROR_MSG_1112 + activeCteateTimes + "次"
+            )
         }
 
         try {
             var active = MhoSkywalkerActive()
-            BeanUtils.copyProperties(activeDTO, active)
+            BeanUtils.copyProperties(activeForm, active)
             active.timeCreate = Date()
+            active.goTime= SimpleDateFormat("yyyy-MM-dd").parse(activeForm.goTimeStr)
             activeRepository.save(active)
-        } catch(e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113,e)
+            return active.activeId
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113, e)
         }
-        return activeDTO
     }
+
     /**
      * 添加活动图片
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    fun createActiveImg(activeId: Long,imageName:String,imageUrl: String){
+    fun createActiveImg(activeId: Long, imageName: String, imageUrl: String) {
         try {
             var img = MhoSkywalkerActiveImage()
-            img.activeId=activeId
-            img.imageName=imageName
-            img.imageUrl=imageUrl
+            img.activeId = activeId
+            img.imageName = imageName
+            img.imageUrl = imageUrl
             activeImgRepository.save(img)
-        } catch(e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113,e)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113, e)
         }
     }
 
@@ -182,7 +189,7 @@ class ActiveService(
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }
         try {
-            val list = activeRepositoryImpl.listAllByParam(params,pageable)
+            val list = activeRepositoryImpl.listAllByParam(params, pageable)
             if (null != list && !CollectionUtils.isEmpty(list)) {
                 for (active in list) {
                     active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
@@ -195,7 +202,8 @@ class ActiveService(
         }
     }
 
-/*    *//**
+/*    */
+    /**
      * 活动列表
      *//*
     @Transactional(readOnly = true)
