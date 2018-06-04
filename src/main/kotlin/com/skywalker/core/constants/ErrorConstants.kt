@@ -75,7 +75,7 @@ object ErrorConstants {
     //错误码-超过每天发布活动次数
     val ERROR_CODE_1112 = "-1112"
     //错误描述-超过24小时内发布活动次数
-    val ERROR_MSG_1112 = "超过24小时内发布活动次数"
+    val ERROR_MSG_1112 = "24小时内发布活动次数超过"
     //错误码-新增失败
     val ERROR_CODE_1113 = "-1113"
     //错误描述-新增失败
