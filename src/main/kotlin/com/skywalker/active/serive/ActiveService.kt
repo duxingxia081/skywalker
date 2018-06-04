@@ -6,6 +6,7 @@ import com.skywalker.active.repository.ActiveLeaveMessageRepository
 import com.skywalker.active.repository.ActiveRepository
 import com.skywalker.active.repository.ActiveUserRepository
 import com.skywalker.active.repository.impl.ActiveRepositoryImpl
+import com.skywalker.active.web.ActiveController
 import com.skywalker.base.bo.MhoSkywalkerActive
 import com.skywalker.base.bo.MhoSkywalkerActiveImage
 import com.skywalker.base.bo.MhoSkywalkerActiveLeaveMessage
@@ -176,7 +177,7 @@ class ActiveService(
      * 活动列表
      */
     @Transactional(readOnly = true)
-    fun listAllByParam(params: ActiveDTO?, pageable: Pageable): List<ActiveDTO> {
+    fun listAllByParam(params: ActiveController.ActiveFormParams?, pageable: Pageable): List<ActiveDTO> {
         if (null == params) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }

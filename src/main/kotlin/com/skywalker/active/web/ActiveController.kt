@@ -25,7 +25,11 @@ import javax.validation.constraints.NotBlank
 
 
 @RestController
-class ActiveController(private val activeTypeService: ActiveTypeService, private val activeService: ActiveService, private val jwtTokenUtil: JwtTokenUtil) {
+class ActiveController(
+    private val activeTypeService: ActiveTypeService,
+    private val activeService: ActiveService,
+    private val jwtTokenUtil: JwtTokenUtil
+) {
     @Value("\${app.img.activity}")
     private val activeImgPath: String = ""
     @Value("\${app.img.head.type}")
@@ -44,9 +48,9 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
      */
     @GetMapping("/activeType/{typeId}/activities")
     fun list(
-            @RequestParam(value = "page", required = false) page: Int?,
-            @RequestParam(value = "size", required = false) size: Int?,
-            @PathVariable typeId: Long?
+        @RequestParam(value = "page", required = false) page: Int?,
+        @RequestParam(value = "size", required = false) size: Int?,
+        @PathVariable typeId: Long?
     ): SuccessResponse {
         val pageable = PageRequest(page ?: 0, size ?: 5)
         val page = activeService.listAllByTypeId(typeId, pageable)
@@ -59,7 +63,7 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
      */
     @GetMapping("/activity/{activeId}")
     fun list(
-            @PathVariable activeId: Long?
+        @PathVariable activeId: Long?
     ): SuccessResponse {
         val activeDTO = activeService.findByActiveId(activeId)
         return SuccessResponse(activeDTO)
@@ -70,9 +74,9 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
      */
     @GetMapping("/activity/{activity}/activityLeaveMsg")
     fun listMsg(
-            @RequestParam(value = "page", required = false) page: Int?,
-            @RequestParam(value = "size", required = false) size: Int?,
-            @PathVariable activity: Long?
+        @RequestParam(value = "page", required = false) page: Int?,
+        @RequestParam(value = "size", required = false) size: Int?,
+        @PathVariable activity: Long?
     ): SuccessResponse {
         val pageable = PageRequest(page ?: 0, size ?: 5)
         val page = activeService.listActiveMsgByActiveId(activity, pageable)
@@ -84,11 +88,12 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
      * 加入活动
      */
     @PostMapping("/activity/{activeId}/activityUser")
-    fun createActivityUser(@PathVariable activeId: Long, request: HttpServletRequest
+    fun createActivityUser(
+        @PathVariable activeId: Long, request: HttpServletRequest
     ): SuccessResponse {
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-                ErrorConstants.ERROR_CODE_1104,
-                ErrorConstants.ERROR_MSG_1104
+            ErrorConstants.ERROR_CODE_1104,
+            ErrorConstants.ERROR_MSG_1104
         )
         return SuccessResponse(activeService.create(activeId, userId))
     }
@@ -97,42 +102,44 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
      * 活动留言
      */
     @PostMapping("/activity/{activeId}/activityMsg")
-    fun createMsg(@Valid @RequestBody params: MsgParams,
-                  @PathVariable activeId: Long,
-                  request: HttpServletRequest,
-                  result: BindingResult
+    fun createMsg(
+        @Valid @RequestBody params: MsgParams,
+        @PathVariable activeId: Long,
+        request: HttpServletRequest,
+        result: BindingResult
     ): SuccessResponse {
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-                ErrorConstants.ERROR_CODE_1104,
-                ErrorConstants.ERROR_MSG_1104
+            ErrorConstants.ERROR_CODE_1104,
+            ErrorConstants.ERROR_MSG_1104
         )
         return SuccessResponse(activeService.createMsg(activeId, userId, params.parentLeaveMessageId, params.content))
     }
 
     data class MsgParams(
-            val parentLeaveMessageId: Long?,
-            @field:NotBlank(message = "留言内容不能为空")
-            @field:Length(max = 100, message = "最大长度不能超过100个文字")
-            val content: String
+        val parentLeaveMessageId: Long?,
+        @field:NotBlank(message = "留言内容不能为空")
+        @field:Length(max = 100, message = "最大长度不能超过100个文字")
+        val content: String
     )
 
     /**
      * 活动
      */
     @PostMapping("/activity")
-    fun createActive(@Valid @RequestBody params: ActiveDTO,
-                     request: HttpServletRequest,
-                     result: BindingResult
+    fun createActive(
+        @Valid @RequestBody params: ActiveDTO,
+        request: HttpServletRequest,
+        result: BindingResult
     ): SuccessResponse {
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-                ErrorConstants.ERROR_CODE_1104,
-                ErrorConstants.ERROR_MSG_1104
+            ErrorConstants.ERROR_CODE_1104,
+            ErrorConstants.ERROR_MSG_1104
         )
         params.postUserId = userId
         return SuccessResponse(activeService.create(params))
@@ -156,8 +163,8 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
 
         } else {
             return ErrorResponse(
-                    ErrorConstants.SUCCESS_CODE_0,
-                    ErrorConstants.SUCCESS_MSG_0_
+                ErrorConstants.SUCCESS_CODE_0,
+                ErrorConstants.SUCCESS_MSG_0_
             )
         }
     }
@@ -167,18 +174,22 @@ class ActiveController(private val activeTypeService: ActiveTypeService, private
      */
     @GetMapping("/activity")
     fun listActivity(
-            @RequestParam(value = "page", required = false) page: Int?,
-            @RequestParam(value = "size", required = false) size: Int?,
-            @RequestParam(value = "startAddressName") startAddressName: String?,
-            @RequestParam(value = "endAddressName") endAddressName: String?,
-            @RequestParam(value = "goTime") goTime: String?
+        @RequestParam(value = "page", required = false) page: Int?,
+        @RequestParam(value = "size", required = false) size: Int?,
+        @RequestParam(value = "startAddressName") startAddressName: String?,
+        @RequestParam(value = "endAddressName") endAddressName: String?,
+        @RequestParam(value = "goTime") goTime: String?
     ): SuccessResponse {
         val pageable = PageRequest(page ?: 0, size ?: 5)
-        var params = ActiveDTO()
-        params.startAddressName = startAddressName
-        params.endAddressName = endAddressName
+        var params = ActiveFormParams(startAddressName,endAddressName,goTime)
         val page = activeService.listAllByParam(params, pageable)
         return SuccessResponse(page)
 
     }
+
+    data class ActiveFormParams(
+        val startAddressName: String?,
+        val endAddressName: String?,
+        val goTime: String?
+    )
 }
