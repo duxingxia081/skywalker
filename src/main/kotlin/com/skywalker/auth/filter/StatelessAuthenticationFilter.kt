@@ -32,7 +32,7 @@ class StatelessAuthenticationFilter(
             SecurityContextHolder.clearContext()
             (res as HttpServletResponse).status = HttpServletResponse.SC_UNAUTHORIZED
         }catch (e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1001,ErrorConstants.ERROR_MSG_1001)
+            throw ServiceException(ErrorConstants.ERROR_CODE_1001,ErrorConstants.ERROR_MSG_1001,e)
         }
     }
 
