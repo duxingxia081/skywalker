@@ -127,16 +127,16 @@ class ActiveController(
         val dto = activeService.findByActiveIdOnly(activeId)
         baseTools.convertAndSendToUser(
             dto.userName!!,
-            ServerMessage("活动留言", "有用户给你发布的活动留言，请注意查看")
+            ServerMessage("活动留言", "你发布的活动有用户留言，请注意查看")
         )
         return SuccessResponse(result)
     }
 
     data class MsgParams(
-        val parentLeaveMessageId: Long?,
+        val parentLeaveMessageId: Long? = null,
         @field:NotBlank(message = "留言内容不能为空")
         @field:Length(max = 100, message = "最大长度不能超过100个文字")
-        val content: String
+        val content: String = ""
     )
 
     /**
