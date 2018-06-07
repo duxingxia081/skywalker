@@ -1,17 +1,19 @@
 package com.skywalker.active.web
 
-import com.skywalker.active.dto.ActiveTypeDTO
 import com.skywalker.active.form.ActiveForm
 import com.skywalker.active.service.ActiveService
 import com.skywalker.active.service.ActiveTypeService
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
+import com.skywalker.core.response.ServerMessage
 import com.skywalker.core.response.SuccessResponse
 import com.skywalker.core.utils.BaseTools
+import com.skywalker.core.utils.BaseUtils
 import org.hibernate.validator.constraints.Length
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.util.CollectionUtils
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
@@ -27,7 +29,8 @@ import javax.validation.constraints.NotBlank
 class ActiveController(
     private val activeTypeService: ActiveTypeService,
     private val activeService: ActiveService,
-    private val jwtTokenUtil: JwtTokenUtil
+    private val jwtTokenUtil: JwtTokenUtil,
+    private val baseTools: BaseTools
 ) {
     @Value("\${app.img.activity}")
     private val activeImgPath: String = ""
@@ -94,7 +97,13 @@ class ActiveController(
             ErrorConstants.ERROR_CODE_1104,
             ErrorConstants.ERROR_MSG_1104
         )
-        return SuccessResponse(activeService.create(activeId, userId))
+        val result = activeService.create(activeId, userId)
+        val dto = activeService.findByActiveIdOnly(activeId)
+        baseTools.convertAndSendToUser(
+            dto.userName!!,
+            ServerMessage("加入活动", "有用户加入到你发布的活动")
+        )
+        return SuccessResponse(result)
     }
 
     /**
@@ -114,7 +123,13 @@ class ActiveController(
             ErrorConstants.ERROR_CODE_1104,
             ErrorConstants.ERROR_MSG_1104
         )
-        return SuccessResponse(activeService.createMsg(activeId, userId, params.parentLeaveMessageId, params.content))
+        val result = activeService.createMsg(activeId, userId, params.parentLeaveMessageId, params.content)
+        val dto = activeService.findByActiveIdOnly(activeId)
+        baseTools.convertAndSendToUser(
+            dto.userName!!,
+            ServerMessage("活动留言", "有用户给你发布的活动留言，请注意查看")
+        )
+        return SuccessResponse(result)
     }
 
     data class MsgParams(
@@ -142,18 +157,18 @@ class ActiveController(
         )
         params.postUserId = userId
         val activeId = activeService.create(params)
-        fileUpload(params.file,activeId)
+        fileUpload(params.file, activeId)
         return SuccessResponse("成功")
     }
 
-    private fun fileUpload(list: List<MultipartFile>?,activeId: Long){
+    private fun fileUpload(list: List<MultipartFile>?, activeId: Long) {
         if (!CollectionUtils.isEmpty(list)) {
             try {
                 for (file in list!!) {
                     //设置允许上传文件类型
-                    BaseTools.checkImgType(file, suffixList)
+                    BaseUtils.checkImgType(file, suffixList)
                     val fileName = activeId.toString() + "." + file.originalFilename!!.substringAfterLast(".")
-                    val name = BaseTools.upLoad(file, activeImgPath, fileName)
+                    val name = BaseUtils.upLoad(file, activeImgPath, fileName)
                     activeService.createActiveImg(activeId, name, "img/heads/$name")
                 }
             } catch (e: IOException) {

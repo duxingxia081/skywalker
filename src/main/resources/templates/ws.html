@@ -19,32 +19,19 @@
 </form>
 
 <script th:inline="javascript">
-    $('#wiselyForm').submit(function(e){
-        e.preventDefault();
-        var text = $('#wiselyForm').find('textarea[name="text"]').val();
-        sendSpittle(text);
-    });
     var headers = {
-        'client-id': 'my-client-id',
         'authorization': 'Bearer:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiZXhwIjoxNTI4ODc4NDY0fQ.0hq4N9ksxWJW8ElQoKABZZswHDuBElkbM7DpCwRTrB25_TghaOFmNJc7jG1a1E4xloxlZveE-fRyOZGjkqzSng'
     };
-    var sock = new SockJS("/socket"); //1
+    var sock = new SockJS("/socket");
     var stomp = Stomp.over(sock);
-    stomp.connect(headers, function(frame) {
-        console.log(frame);
-        stomp.subscribe("/topic/notifications", handleNotification);//2
+    stomp.connect(headers, function() {
+        stomp.subscribe("/user/topic/message", handleNotification);
     });
 
-
-
-    function handleNotification(message) {
-        $('#output').append("<b>Received: " + message.body + "</b><br/>")
+    function handleNotification(response) {
+        var returnData = JSON.parse(response.body);
+        $('#output').append("<b>标题: "+returnData.title+"</b><br/>内容:" + returnData.message + "<br/>")
     }
-
-    function sendSpittle(text) {
-        stomp.send("/chat", {}, text);//3
-    }
-    $('#stop').click(function() {sock.close()});
 </script>
 
 <div id="output"></div>

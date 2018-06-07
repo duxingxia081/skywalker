@@ -29,5 +29,9 @@ class ServiceException : Exception {
         }
         this.value = sb.toString()
     }
-
+    constructor(message: String,e:Exception) : super(message) {
+        e.printStackTrace()
+        this.errorKey = "-1"
+        this.value = message
+    }
 }

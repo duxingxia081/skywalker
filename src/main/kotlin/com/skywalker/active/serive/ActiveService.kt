@@ -153,7 +153,7 @@ class ActiveService(
             var active = MhoSkywalkerActive()
             BeanUtils.copyProperties(activeForm, active)
             active.timeCreate = Date()
-            active.goTime= SimpleDateFormat("yyyy-MM-dd").parse(activeForm.goTimeStr)
+            active.goTime = SimpleDateFormat("yyyy-MM-dd").parse(activeForm.goTimeStr)
             activeRepository.save(active)
             return active.activeId
         } catch (e: Exception) {
@@ -223,4 +223,14 @@ class ActiveService(
             throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }
     }*/
+    /**
+     * 活动详情
+     */
+    fun findByActiveIdOnly(activeId: Long): ActiveDTO {
+        try {
+            return activeRepository.listAllByActiveId(activeId)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_MSG_1110, e)
+        }
+    }
 }

@@ -36,4 +36,14 @@ class JwtTokenUtil(
             .parseUserFromToken(token)
             .let(::UserAuthentication)
     }
+
+    fun getUserFromToken(request: HttpServletRequest): Authentication? {
+        val authHeader = request.getHeader("authorization") ?: return null
+        if (!authHeader.startsWith("Bearer")) return null
+        val token = authHeader.substring(7)
+        if (token.isEmpty()) return null
+        return tokenHandler
+            .parseUserFromToken(token)
+            .let(::UserAuthentication)
+    }
 }

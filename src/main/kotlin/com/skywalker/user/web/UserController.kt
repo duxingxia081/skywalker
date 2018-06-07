@@ -6,6 +6,7 @@ import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.response.ErrorResponse
 import com.skywalker.core.response.SuccessResponse
 import com.skywalker.core.utils.BaseTools
+import com.skywalker.core.utils.BaseUtils
 import com.skywalker.user.dto.SkywalkerUserDTO
 import com.skywalker.user.service.UserService
 import org.springframework.beans.factory.annotation.Value
@@ -55,14 +56,14 @@ class UserController(private val userService: UserService, private val jwtTokenU
     fun handleFileUpload(@RequestParam("file") file: MultipartFile?, request: HttpServletRequest): Any {
         if (null != file && !file.isEmpty) {
             //设置允许上传文件类型
-            BaseTools.checkImgType(file, suffixList)
+            BaseUtils.checkImgType(file, suffixList)
             try {
                 val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
                     ErrorConstants.ERROR_CODE_1104,
                     ErrorConstants.ERROR_MSG_1104
                 )
                 val fileName = userId.toString() + "." + file.originalFilename!!.substringAfterLast(".")
-                val name = BaseTools.upLoad(file, headImgPath, fileName)
+                val name = BaseUtils.upLoad(file, headImgPath, fileName)
                 return SuccessResponse(userService.updateHead(userId, "img/heads/$name"))
             } catch (e: IOException) {
                 throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
