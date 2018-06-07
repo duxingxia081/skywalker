@@ -11,49 +11,50 @@ import org.springframework.beans.BeanUtils
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import javax.validation.Validator
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 class UserServiceImpl(
-        private val userRepository: UserRepository,
-        private val validator: Validator
+    private val userRepository: UserRepository
 ) : UserService {
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     override fun create(userDto: SkywalkerUserDTO): SkywalkerUserDTO {
-        validate(userDto)
         var user = userRepository.findByUserName(userDto.userName)
         if (null != user)
             throw ServiceException(ErrorConstants.ERROR_CODE_1102, ErrorConstants.ERROR_MSG_1102)
         try {
             user = MhoSkywalkerUser()
             BeanUtils.copyProperties(userDto, user)
-            user.password = encrypt(user.password)?:""
+            user.password = encrypt(user.password) ?: ""
             user.timeCreate = Date()
             userRepository.save(user)
-        } catch(e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1103, ErrorConstants.ERROR_MSG_1103,e)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1103, ErrorConstants.ERROR_MSG_1103, e)
         }
         return userDto
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     override fun update(userDto: SkywalkerUserDTO): SkywalkerUserDTO {
         var user = userRepository.getOne(userDto.userId)
         try {
-            userRepository.save(user.copy(nickname = userDto.nickname,
-                    sign = userDto.sign,
-                    headImage = userDto.headImage?:user.headImage,
-                    password = encrypt(userDto.password)?:user.password))
-        } catch(e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1108, ErrorConstants.ERROR_MSG_1108,e)
+            userRepository.save(
+                user.copy(
+                    nickname = userDto.nickname ?: userDto.nickname,
+                    sign = userDto.sign ?: userDto.nickname,
+                    headImage = userDto.headImage ?: user.headImage,
+                    password = encrypt(userDto.password) ?: user.password
+                )
+            )
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1108, ErrorConstants.ERROR_MSG_1108, e)
         }
         return userDto
     }
-    @Transactional(readOnly = true)
+
     override fun findByUserName(userName: String): SkywalkerUserDTO? {
         val user: MhoSkywalkerUser? = userRepository.findByUserName(userName)
         if (null != user) {
@@ -64,24 +65,33 @@ class UserServiceImpl(
         return null
     }
 
-    @Transactional(readOnly = true)
     override fun findById(userId: Long): UserDTO {
-        val user = userRepository.getOne(userId) ?: throw ServiceException(ErrorConstants.ERROR_CODE_1105, ErrorConstants.ERROR_MSG_1105)
+        val user = userRepository.getOne(userId)
         var dto = UserDTO()
         BeanUtils.copyProperties(user, dto)
         return dto
     }
 
-    private fun validate(user: SkywalkerUserDTO) = validator.validate(user).apply {
-        if (isNotEmpty()) throw DataIntegrityViolationException(toString())
+    private fun encrypt(secret: String?): String? {
+        return if (null == secret)
+            null
+        else {
+            BCryptPasswordEncoder().encode(secret)
+        }
     }
 
-    private fun encrypt(secret: String?): String? {
-        if(null==secret)
-            return null
-        else
-        {
-            return BCryptPasswordEncoder().encode(secret)
+    @Transactional
+    override fun updateHead(userId: Long, headImg: String): String {
+        var user = userRepository.getOne(userId)
+        try {
+            userRepository.save(
+                user.copy(
+                    headImage = headImg
+                )
+            )
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1108, ErrorConstants.ERROR_MSG_1108, e)
         }
+        return "修改成功"
     }
 }

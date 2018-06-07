@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.CollectionUtils
 import java.text.SimpleDateFormat
@@ -27,6 +26,7 @@ import java.util.*
 
 
 @Service
+@Transactional(readOnly = true)
 class ActiveService(
     private val activeRepository: ActiveRepository,
     private val activeUserRepository: ActiveUserRepository,
@@ -41,7 +41,7 @@ class ActiveService(
     /**
      * 加入活动
      */
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     fun create(activeId: Long, userId: Long): String {
 
         val bo = activeUserRepository.findByActiveIdAndUserId(activeId, userId)
@@ -63,7 +63,7 @@ class ActiveService(
     /**
      * 留言
      */
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     fun createMsg(activeId: Long, userId: Long, parentLeaveMessageId: Long?, content: String): String {
         try {
             var msg = MhoSkywalkerActiveLeaveMessage()
@@ -82,7 +82,6 @@ class ActiveService(
     /**
      * 活动列表
      */
-    @Transactional(readOnly = true)
     fun listAllByTypeId(typeId: Long?, pageable: Pageable): Page<ActiveDTO>? {
         if (null == typeId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
@@ -104,7 +103,6 @@ class ActiveService(
     /**
      * 活动详情
      */
-    @Transactional(readOnly = true)
     fun findByActiveId(activeId: Long?): ActiveDTO? {
         if (null == activeId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
@@ -124,7 +122,6 @@ class ActiveService(
     /**
      * 留言列表
      */
-    @Transactional(readOnly = true)
     fun listActiveMsgByActiveId(activeId: Long?, pageable: Pageable): Page<MhoSkywalkerActiveLeaveMessage>? {
         if (null == activeId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
@@ -139,7 +136,7 @@ class ActiveService(
     /**
      * 添加活动
      */
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     fun create(activeForm: ActiveForm): Long {
 
         //当前时间减去1天
@@ -167,7 +164,7 @@ class ActiveService(
     /**
      * 添加活动图片
      */
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     fun createActiveImg(activeId: Long, imageName: String, imageUrl: String) {
         try {
             var img = MhoSkywalkerActiveImage()
@@ -183,7 +180,6 @@ class ActiveService(
     /**
      * 活动列表
      */
-    @Transactional(readOnly = true)
     fun listAllByParam(params: ActiveController.ActiveFormParams?, pageable: Pageable): List<ActiveDTO> {
         if (null == params) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)

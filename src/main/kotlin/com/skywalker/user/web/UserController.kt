@@ -20,9 +20,9 @@ import javax.validation.Valid
 @RequestMapping("/users")
 class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil) {
     @Value("\${app.img.head}")
-    private val headImgPath: String=""
+    private val headImgPath: String = ""
     @Value("\${app.img.head.type}")
-    private val suffixList: String=""
+    private val suffixList: String = ""
 
     @PostMapping
     fun create(@Valid @RequestBody params: SkywalkerUserDTO, result: BindingResult): SuccessResponse {
@@ -31,16 +31,18 @@ class UserController(private val userService: UserService, private val jwtTokenU
         }
         return SuccessResponse(userService.create(params))
     }
+
     @PutMapping
-    fun update(@RequestBody params: SkywalkerUserDTO,request: HttpServletRequest): SuccessResponse {
+    fun update(@RequestBody params: SkywalkerUserDTO, request: HttpServletRequest): SuccessResponse {
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-                ErrorConstants.ERROR_CODE_1104,
-                ErrorConstants.ERROR_MSG_1104
+            ErrorConstants.ERROR_CODE_1104,
+            ErrorConstants.ERROR_MSG_1104
         )
-        params.userId=userId
+        params.userId = userId
         return SuccessResponse(userService.update(params))
     }
-    @RequestMapping(value = "/myinfo", method = arrayOf(RequestMethod.GET))
+
+    @GetMapping(value = "/myinfo")
     private fun myInfo(request: HttpServletRequest): SuccessResponse {
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
             ErrorConstants.ERROR_CODE_1104,
@@ -48,23 +50,22 @@ class UserController(private val userService: UserService, private val jwtTokenU
         )
         return SuccessResponse(userService.findById(userId))
     }
-    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "/headImg")
-    fun handleFileUpload(@RequestParam("file") file: MultipartFile?,request: HttpServletRequest): Any {
-        if (null!=file&&!file.isEmpty) {
+
+    @PostMapping(value = "/headImg")
+    fun handleFileUpload(@RequestParam("file") file: MultipartFile?, request: HttpServletRequest): Any {
+        if (null != file && !file.isEmpty) {
             //设置允许上传文件类型
-            BaseTools.checkImgType(file,suffixList)
+            BaseTools.checkImgType(file, suffixList)
             try {
                 val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-                        ErrorConstants.ERROR_CODE_1104,
-                        ErrorConstants.ERROR_MSG_1104
+                    ErrorConstants.ERROR_CODE_1104,
+                    ErrorConstants.ERROR_MSG_1104
                 )
-                val fileName = userId.toString()+"."+file.originalFilename!!.substringAfterLast(".")
-                val name = BaseTools.upLoad(file,headImgPath,fileName)
-                return SuccessResponse(
-                    "img/heads/$name"
-                )
+                val fileName = userId.toString() + "." + file.originalFilename!!.substringAfterLast(".")
+                val name = BaseTools.upLoad(file, headImgPath, fileName)
+                return SuccessResponse(userService.updateHead(userId, "img/heads/$name"))
             } catch (e: IOException) {
-                throw ServiceException(ErrorConstants.ERROR_CODE_1,ErrorConstants.ERROR_MSG_1,e)
+                throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
             }
 
         } else {

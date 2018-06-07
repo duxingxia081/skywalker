@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class ActiveTypeService(
         private val activeTypeRepository: ActiveTypeRepository
 ) {
-    @Transactional(readOnly = true)
     fun list(): MutableList<ActiveTypeDTO>? {
         val list = activeTypeRepository.findAll()
         if(null!=list)
