@@ -43,10 +43,15 @@ class UserServiceImpl(
         try {
             userRepository.save(
                 user.copy(
-                    nickname = userDto.nickname ?: userDto.nickname,
-                    sign = userDto.sign ?: userDto.nickname,
+                    nickname = userDto.nickname ?: user.nickname,
+                    sign = userDto.sign ?: user.sign,
                     headImage = userDto.headImage ?: user.headImage,
-                    password = encrypt(userDto.password) ?: user.password
+                    password = encrypt(userDto.password) ?: user.password,
+                    address = userDto.address ?: user.address,
+                    sex = userDto.sex ?: user.sex,
+                    qqId = userDto.qqId ?: user.qqId,
+                    wechatId = userDto.wechatId ?: user.wechatId,
+                    mobilePhone = userDto.mobilePhone ?: user.mobilePhone
                 )
             )
         } catch (e: Exception) {
