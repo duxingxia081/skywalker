@@ -7,15 +7,14 @@ import javax.persistence.*
 @Entity
 @JsonIgnoreProperties(value = *arrayOf("hibernateLazyInitializer", "handler", "fieldHandler"))
 data class MhoSkywalkerTravelNotes(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var travelNotesId: Long,
-        var postUserId: Long,
-        var title: String,
-        var content: String,
-        var addressName: String,
-        var addressCoordinate: String,
-        @Temporal(TemporalType.TIMESTAMP)
-        var timeCreate: Date,
-        var isDelete: String
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var travelNotesId: Long = 0L,
+    var postUserId: Long = 0L,
+    var title: String = "",
+    var content: String? = null,
+    var addressName: String? = null,
+    var addressCoordinate: String? = null,
+    @Temporal(TemporalType.TIMESTAMP)
+    var timeCreate: Date? = null
 )

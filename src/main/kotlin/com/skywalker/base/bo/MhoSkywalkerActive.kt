@@ -11,7 +11,7 @@ data class MhoSkywalkerActive(
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var activeId: Long = 0,
         var activeTitle: String = "",
-        var postUserId: Long = 0,
+        var postUserId: Long ? = null,
         var typeId: Long = 0,
         var startAddressName: String? = null,
         var startAddressCoordinate: String? = null,
