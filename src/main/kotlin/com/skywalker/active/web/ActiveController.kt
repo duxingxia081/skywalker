@@ -169,7 +169,7 @@ class ActiveController(
                     BaseUtils.checkImgType(file, suffixList)
                     val fileName = activeId.toString() + "." + file.originalFilename!!.substringAfterLast(".")
                     val name = BaseUtils.upLoad(file, activeImgPath, fileName)
-                    activeService.createActiveImg(activeId, name, "img/heads/$name")
+                    activeService.createActiveImg(activeId, name, "img/activeImg/$name")
                 }
             } catch (e: IOException) {
                 throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
