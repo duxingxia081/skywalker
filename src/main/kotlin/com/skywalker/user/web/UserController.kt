@@ -5,7 +5,6 @@ import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.response.ErrorResponse
 import com.skywalker.core.response.SuccessResponse
-import com.skywalker.core.utils.BaseTools
 import com.skywalker.core.utils.BaseUtils
 import com.skywalker.user.dto.SkywalkerUserDTO
 import com.skywalker.user.service.UserService

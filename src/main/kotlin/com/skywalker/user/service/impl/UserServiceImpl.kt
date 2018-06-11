@@ -8,12 +8,10 @@ import com.skywalker.user.dto.UserDTO
 import com.skywalker.user.repository.UserRepository
 import com.skywalker.user.service.UserService
 import org.springframework.beans.BeanUtils
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import javax.validation.Validator
 
 @Service
 @Transactional(readOnly = true)
