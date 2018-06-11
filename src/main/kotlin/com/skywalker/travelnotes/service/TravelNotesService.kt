@@ -3,6 +3,7 @@ package com.skywalker.active.service
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.travelnotes.dto.TravelNotesDTO
+import com.skywalker.travelnotes.dto.TravelNotesParamDTO
 import com.skywalker.travelnotes.repository.TravelNotesLikeRepository
 import com.skywalker.travelnotes.repository.TravelNotesMessageRepository
 import com.skywalker.travelnotes.repository.TravelNotesRepository
@@ -23,9 +24,17 @@ class TravelNotesService(
     /**
      * 活动列表
      */
-    fun listAll(pageable: Pageable): Page<TravelNotesDTO>? {
+    fun listAll(param: TravelNotesParamDTO?, pageable: Pageable): Page<TravelNotesDTO>? {
         try {
-            val list = travelNotesRepository.listAll(pageable)
+            var list: Page<TravelNotesDTO>? =
+                when {
+                    null != param?.postUserId -> travelNotesRepository.listByUserId(param.postUserId!!, pageable)
+                    null != param?.travelNotesId -> travelNotesRepository.listByTravelNotesId(
+                        param.travelNotesId!!,
+                        pageable
+                    )
+                    else -> travelNotesRepository.listAll(pageable)
+                }
             if (null != list && !CollectionUtils.isEmpty(list.content)) {
                 for (travelNote in list.content) {
                     travelNote.notesLikeCount = travelNotesLikeRepository.countByTravelNotesId(travelNote.travelNotesId)
