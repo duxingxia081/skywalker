@@ -54,15 +54,12 @@ class UserController(private val userService: UserService, private val jwtTokenU
     @PostMapping(value = "/headImg")
     fun handleFileUpload(@RequestParam("file") file: MultipartFile?, request: HttpServletRequest): Any {
         if (null != file && !file.isEmpty) {
-            //设置允许上传文件类型
-            BaseUtils.checkImgType(file, suffixList)
             try {
                 val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
                     ErrorConstants.ERROR_CODE_1104,
                     ErrorConstants.ERROR_MSG_1104
                 )
-                val fileName = userId.toString() + "." + file.originalFilename!!.substringAfterLast(".")
-                val name = BaseUtils.upLoad(file, headImgPath, fileName)
+                val name = BaseUtils.fileUpLoad(file, headImgPath, suffixList)
                 return SuccessResponse(userService.updateHead(userId, "img/heads/$name"))
             } catch (e: IOException) {
                 throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
