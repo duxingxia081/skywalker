@@ -4,6 +4,7 @@ import com.skywalker.active.service.TravelNotesService
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
+import com.skywalker.core.response.ServerMessage
 import com.skywalker.core.response.SuccessResponse
 import com.skywalker.core.utils.BaseUtils
 import com.skywalker.travelnotes.dto.TravelNotesParamDTO
@@ -136,5 +137,35 @@ class TravelNotesController(
             }
 
         }
+    }
+
+    /**
+     * 点赞
+     */
+    @PostMapping("/travelNotes/{travelNotesId}/travelNotesLike")
+    fun createTravelNotesLike(
+        @PathVariable travelNotesId: Long, request: HttpServletRequest
+    ): SuccessResponse {
+        val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
+            ErrorConstants.ERROR_CODE_1104,
+            ErrorConstants.ERROR_MSG_1104
+        )
+        val result = travelNotesService.create(travelNotesId, userId)
+        return SuccessResponse(result)
+    }
+
+    /**
+     * 取消点赞
+     */
+    @DeleteMapping("/travelNotes/{travelNotesId}/travelNotesLike")
+    fun delTravelNotesLike(
+        @PathVariable travelNotesId: Long, request: HttpServletRequest
+    ): SuccessResponse {
+        val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
+            ErrorConstants.ERROR_CODE_1104,
+            ErrorConstants.ERROR_MSG_1104
+        )
+        travelNotesService.delete(travelNotesId, userId)
+        return SuccessResponse("取消点赞成功")
     }
 }

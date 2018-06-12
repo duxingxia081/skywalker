@@ -2,6 +2,7 @@ package com.skywalker.active.service
 
 import com.skywalker.base.bo.MhoSkywalkerTravelNotes
 import com.skywalker.base.bo.MhoSkywalkerTravelNotesImage
+import com.skywalker.base.bo.MhoSkywalkerTravelNotesLike
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.travelnotes.dto.TravelNotesDTO
@@ -86,6 +87,42 @@ class TravelNotesService(
             travelNotesImgRepository.save(img)
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113, e)
+        }
+    }
+
+    /**
+     * 点赞
+     */
+    @Transactional
+    fun create(travelNotesId: Long, userId: Long): Long {
+
+        val like = travelNotesLikeRepository.findByParam(travelNotesId, userId)
+        if (null != like) {
+            throw ServiceException("一条游记只能点赞一次")
+        }
+        try {
+            var bo = MhoSkywalkerTravelNotesLike()
+            bo.travelNotesId = travelNotesId
+            bo.dolikeUserId = userId
+            travelNotesLikeRepository.save(bo)
+            return bo.likeId
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1113, ErrorConstants.ERROR_MSG_1113, e)
+        }
+    }
+
+    /**
+     * 取消点赞
+     */
+    @Transactional
+    fun delete(travelNotesId: Long, userId: Long) {
+        try {
+            val like = travelNotesLikeRepository.findByParam(travelNotesId, userId)
+            if (null != like) {
+                travelNotesLikeRepository.delete(like)
+            }
+        } catch (e: Exception) {
+            throw ServiceException("取消点赞失败", e)
         }
     }
 }

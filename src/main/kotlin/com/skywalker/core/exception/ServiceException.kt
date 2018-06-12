@@ -34,4 +34,8 @@ class ServiceException : Exception {
         this.errorKey = "-1"
         this.value = message
     }
+    constructor(message: String) : super(message) {
+        this.errorKey = "-1"
+        this.value = message
+    }
 }

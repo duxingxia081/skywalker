@@ -10,13 +10,10 @@ import javax.persistence.Id
 @Entity
 @JsonIgnoreProperties(value = *arrayOf("hibernateLazyInitializer", "handler", "fieldHandler"))
 data class MhoSkywalkerTravelNotesLike(
-
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var likeId: Long,
-        var travelNotesId: Long,
-        var dolikeUserId: Long,
-        var timeCreate: Date,
-        var isDelete: String
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var likeId: Long = 0L,
+    var travelNotesId: Long = 0L,
+    var dolikeUserId: Long? = null,
+    var timeCreate: Date = Date()
 )
