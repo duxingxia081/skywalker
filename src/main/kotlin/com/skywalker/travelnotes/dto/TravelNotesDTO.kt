@@ -16,4 +16,5 @@ data class TravelNotesDTO(
 {
         var notesLikeCount: Long = 0
         var notesMsgCount: Long = 0
+        var listTravelNotesImgDTO: List<TravelNotesImgDTO>? = null
 }

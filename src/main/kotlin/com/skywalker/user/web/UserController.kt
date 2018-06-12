@@ -21,7 +21,7 @@ import javax.validation.Valid
 class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil) {
     @Value("\${app.img.head}")
     private val headImgPath: String = ""
-    @Value("\${app.img.head.type}")
+    @Value("\${app.img.type}")
     private val suffixList: String = ""
 
     @PostMapping

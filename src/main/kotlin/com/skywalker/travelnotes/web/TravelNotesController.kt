@@ -7,7 +7,8 @@ import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.response.SuccessResponse
 import com.skywalker.core.utils.BaseUtils
 import com.skywalker.travelnotes.dto.TravelNotesParamDTO
-import com.skywalker.user.form.TravelNotesForm
+import com.skywalker.travelnotes.form.TravelNotesForm
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.util.CollectionUtils
@@ -25,6 +26,10 @@ class TravelNotesController(
     private val travelNotesService: TravelNotesService,
     private val jwtTokenUtil: JwtTokenUtil
 ) {
+    @Value("\${app.img.travelNote}")
+    private val travelNotesImgPath: String = ""
+    @Value("\${app.img.type}")
+    private val suffixList: String = ""
 
     /**
      * 游记列表
@@ -96,11 +101,12 @@ class TravelNotesController(
         val page = travelNotesService.listAll(param, pageable)
         return SuccessResponse(page?.content?.get(0))
     }
+
     /**
-     * 新增活动
+     * 新增游记
      */
     @PostMapping("/travelNotes")
-    fun createActive(
+    fun createTravelNotes(
         @Valid params: TravelNotesForm,
         result: BindingResult,
         request: HttpServletRequest
@@ -113,8 +119,22 @@ class TravelNotesController(
             ErrorConstants.ERROR_MSG_1104
         )
         params.postUserId = userId
-        val activeId = travelNotesService.create(params)
-        //fileUpload(params.file, activeId)
+        val travelNotesId = travelNotesService.create(params)
+        fileUpload(params.file, travelNotesId)
         return SuccessResponse("成功")
+    }
+
+    private fun fileUpload(list: List<MultipartFile>?, travelNotesId: Long) {
+        if (!CollectionUtils.isEmpty(list)) {
+            try {
+                for (file in list!!) {
+                    val name = BaseUtils.fileUpLoad(file, travelNotesImgPath, suffixList)
+                    travelNotesService.createTravelNotesImg(travelNotesId, name, "img/travelNote/$name")
+                }
+            } catch (e: IOException) {
+                throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
+            }
+
+        }
     }
 }

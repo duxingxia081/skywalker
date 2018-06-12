@@ -34,7 +34,7 @@ class ActiveController(
 ) {
     @Value("\${app.img.activity}")
     private val activeImgPath: String = ""
-    @Value("\${app.img.head.type}")
+    @Value("\${app.img.type}")
     private val suffixList: String = ""
 
     /**
@@ -165,10 +165,7 @@ class ActiveController(
         if (!CollectionUtils.isEmpty(list)) {
             try {
                 for (file in list!!) {
-                    //设置允许上传文件类型
-                    BaseUtils.checkImgType(file, suffixList)
-                    val fileName = activeId.toString() + "." + file.originalFilename!!.substringAfterLast(".")
-                    val name = BaseUtils.upLoad(file, activeImgPath, fileName)
+                    val name = BaseUtils.fileUpLoad(file, activeImgPath, suffixList)
                     activeService.createActiveImg(activeId, name, "img/activeImg/$name")
                 }
             } catch (e: IOException) {
