@@ -3,8 +3,10 @@ package com.skywalker.active.service
 import com.skywalker.base.bo.MhoSkywalkerTravelNotes
 import com.skywalker.base.bo.MhoSkywalkerTravelNotesImage
 import com.skywalker.base.bo.MhoSkywalkerTravelNotesLike
+import com.skywalker.base.bo.MhoSkywalkerTravelNotesMessage
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
+import com.skywalker.core.utils.BaseTools
 import com.skywalker.travelnotes.dto.TravelNotesDTO
 import com.skywalker.travelnotes.dto.TravelNotesParamDTO
 import com.skywalker.travelnotes.repository.TravelNotesImgRepository
@@ -12,6 +14,7 @@ import com.skywalker.travelnotes.repository.TravelNotesLikeRepository
 import com.skywalker.travelnotes.repository.TravelNotesMessageRepository
 import com.skywalker.travelnotes.repository.TravelNotesRepository
 import com.skywalker.travelnotes.form.TravelNotesForm
+import com.skywalker.travelnotes.form.TravelNotesMessageForm
 import org.springframework.beans.BeanUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -27,7 +30,8 @@ class TravelNotesService(
     private val travelNotesRepository: TravelNotesRepository,
     private val travelNotesMessageRepository: TravelNotesMessageRepository,
     private val travelNotesLikeRepository: TravelNotesLikeRepository,
-    private val travelNotesImgRepository: TravelNotesImgRepository
+    private val travelNotesImgRepository: TravelNotesImgRepository,
+    private val baseTools: BaseTools
 ) {
     /**
      * 游记列表
@@ -123,6 +127,50 @@ class TravelNotesService(
             }
         } catch (e: Exception) {
             throw ServiceException("取消点赞失败", e)
+        }
+    }
+
+    /**
+     * 留言列表
+     */
+    fun listTravelNotesMsgByTravelNotesId(
+        travelNotesId: Long?,
+        pageable: Pageable
+    ): Page<MhoSkywalkerTravelNotesMessage>? {
+        if (null == travelNotesId) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
+        }
+        try {
+            return travelNotesMessageRepository.listAllParentByTravelNotesId(travelNotesId, pageable)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
+        }
+    }
+
+    /**
+     * 留言
+     */
+    @Transactional
+    fun createMsg(form: TravelNotesMessageForm): String {
+        try {
+            var msg = MhoSkywalkerTravelNotesMessage()
+            BeanUtils.copyProperties(form, msg)
+            travelNotesMessageRepository.save(msg)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
+        }
+        return "成功"
+    }
+
+    /**
+     * 活动详情
+     */
+    fun getUserNameByTravelNotesId(travelNotesId: Long): String? {
+        try {
+            val travelNotes = travelNotesRepository.getOne(travelNotesId)
+            return baseTools.getUserNameByUserId(travelNotes.postUserId)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_MSG_1110, e)
         }
     }
 }

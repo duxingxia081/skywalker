@@ -6,9 +6,11 @@ import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.response.ServerMessage
 import com.skywalker.core.response.SuccessResponse
+import com.skywalker.core.utils.BaseTools
 import com.skywalker.core.utils.BaseUtils
 import com.skywalker.travelnotes.dto.TravelNotesParamDTO
 import com.skywalker.travelnotes.form.TravelNotesForm
+import com.skywalker.travelnotes.form.TravelNotesMessageForm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -25,7 +27,8 @@ import javax.validation.Valid
 @RestController
 class TravelNotesController(
     private val travelNotesService: TravelNotesService,
-    private val jwtTokenUtil: JwtTokenUtil
+    private val jwtTokenUtil: JwtTokenUtil,
+    private val baseTools: BaseTools
 ) {
     @Value("\${app.img.travelNote}")
     private val travelNotesImgPath: String = ""
@@ -167,5 +170,52 @@ class TravelNotesController(
         )
         travelNotesService.delete(travelNotesId, userId)
         return SuccessResponse("取消点赞成功")
+    }
+
+    /**
+     * 游记留言列表
+     */
+    @GetMapping("/travelNotes/{travelNotesId}/travelNotesMsg")
+    fun listMsg(
+        @RequestParam(value = "page", required = false) page: Int?,
+        @RequestParam(value = "size", required = false) size: Int?,
+        @PathVariable travelNotesId: Long?
+    ): SuccessResponse {
+        val sort = Sort(Sort.Direction.DESC, "timeCreate")
+        val pageable = PageRequest(page ?: 0, size ?: 5, sort)
+        val page = travelNotesService.listTravelNotesMsgByTravelNotesId(travelNotesId, pageable)
+        var map: HashMap<String, Any?> = hashMapOf("total" to page?.totalElements, "list" to page?.content)
+        return SuccessResponse(map)
+    }
+
+    /**
+     * 游记留言
+     */
+    @PostMapping("/travelNotes/{travelNotesId}/travelNotesMsg")
+    fun createMsg(
+        @Valid @RequestBody params: TravelNotesMessageForm,
+        result: BindingResult,
+        @PathVariable travelNotesId: Long,
+        request: HttpServletRequest
+    ): SuccessResponse {
+        if (result.hasErrors()) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
+        }
+        val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
+            ErrorConstants.ERROR_CODE_1104,
+            ErrorConstants.ERROR_MSG_1104
+        )
+        params.userId = userId
+        params.travelNotesId = travelNotesId
+
+        val result = travelNotesService.createMsg(params)
+        val userName = travelNotesService.getUserNameByTravelNotesId(travelNotesId)
+        if (null != userName) {
+            baseTools.convertAndSendToUser(
+                userName,
+                ServerMessage("游记留言", "你发布的游记有用户留言")
+            )
+        }
+        return SuccessResponse(result)
     }
 }

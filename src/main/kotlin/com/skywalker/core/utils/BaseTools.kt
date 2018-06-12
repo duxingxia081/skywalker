@@ -24,10 +24,17 @@ class BaseTools(
      * 发送消息
      */
     fun convertAndSendToUser(userId: Long, serverMessage: ServerMessage) {
-        val userName = userService.findById(userId).userName ?: return
+        val userName = getUserNameByUserId(userId) ?: return
         messagingTemplate.convertAndSendToUser(
             userName,
             "/topic/message", serverMessage
         )
+    }
+
+    /**
+     * 根据用户id获取用户名
+     */
+    fun getUserNameByUserId(userId: Long): String? {
+        return userService.findById(userId).userName
     }
 }

@@ -8,7 +8,7 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 
 @Entity
-@JsonIgnoreProperties(value = *arrayOf("hibernateLazyInitializer", "handler", "fieldHandler"))
+@JsonIgnoreProperties(value = ["hibernateLazyInitializer", "handler", "fieldHandler"])
 data class MhoSkywalkerTravelNotesLike(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

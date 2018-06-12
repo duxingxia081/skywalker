@@ -113,7 +113,7 @@ create table if not exists mho_skywalker_travel_notes_message (
 	travel_notes_id int not null comment '游记ID',
 	constraint fk_message_travel_notes_id foreign key (travel_notes_id) references mho_skywalker_travel_notes(travel_notes_id),
 	parent_message_id int comment '父评论ID',
-	send_message_user_id int not null comment '评论人ID',
+	user_id int not null comment '评论人ID',
 	content varchar(255) not null comment '评论内容',
 	time_create datetime default current_timestamp comment '创建时间',
 	is_delete char default 0 comment '是否删除'
