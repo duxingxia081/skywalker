@@ -3,6 +3,7 @@ package com.skywalker.auth.conf
 import com.skywalker.auth.filter.StatelessAuthenticationFilter
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -15,29 +16,31 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import javax.xml.ws.Endpoint
 
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
-        private val userDetailsService: UserDetailsService,
-        private val statelessAuthenticationFilter: StatelessAuthenticationFilter
+    private val userDetailsService: UserDetailsService,
+    private val statelessAuthenticationFilter: StatelessAuthenticationFilter
 ) : WebSecurityConfigurerAdapter(true) {
     override fun configure(http: HttpSecurity) {
         try {
             http.csrf().disable()
 
             http
-                    .exceptionHandling().and()
-                    .anonymous().and()
-                    .servletApi().and()
-                    .headers().cacheControl()
+                .exceptionHandling().and()
+                .anonymous().and()
+                .servletApi().and()
+                .headers().cacheControl()
 
             http.authorizeRequests()
-                    .antMatchers(HttpMethod.GET, "/users/myinfo").hasRole("USER")
-                    .antMatchers(HttpMethod.POST, "/activity/*/activityImg").hasRole("USER")
-                    .and()
+                .antMatchers(HttpMethod.GET, "/users/myinfo").hasRole("USER")
+                .antMatchers(HttpMethod.POST, "/activity/*/activityImg").hasRole("USER")
+                .and()
+            http.requestMatcher(EndpointRequest.toAnyEndpoint()).authorizeRequests().anyRequest().permitAll()
 
             http.addFilterBefore(statelessAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
         } catch (e: AccessDeniedException) {
@@ -49,7 +52,7 @@ class SecurityConfig(
 
     @Bean
     override fun authenticationManagerBean(): AuthenticationManager =
-            super.authenticationManagerBean()
+        super.authenticationManagerBean()
 
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.userDetailsService(userDetailsService).passwordEncoder(BCryptPasswordEncoder())

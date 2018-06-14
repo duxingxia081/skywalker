@@ -28,7 +28,8 @@ data class ActiveDTO(
         var userName: String? = null,
         var nickname: String? = null,
         var headImage: String? = null,
-        var typeName: String? = null
+        var typeName: String? = null,
+        var timeCreate: Date? = null
 ) {
     var listActiveUserDTO: List<ActiveUserDTO>? = null
     var listActiveImgDTO: List<ActiveImgDTO>? = null

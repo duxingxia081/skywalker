@@ -198,4 +198,16 @@ class ActiveController(
         var endAddressName: String? = null,
         var goTime: String? = null
     )
+
+    /**
+     * 最新活动列表
+     */
+    @GetMapping("/activity/newActivity")
+    fun listNewActivity(
+        @RequestParam(value = "time") time: Long
+    ): SuccessResponse {
+        val list = activeService.listAllNewAcitity(time)
+        return SuccessResponse(list)
+
+    }
 }

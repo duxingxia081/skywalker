@@ -233,4 +233,22 @@ class ActiveService(
             throw ServiceException(ErrorConstants.ERROR_MSG_1110, e)
         }
     }
+    /**
+     * 最新活动
+     */
+    fun listAllNewAcitity(time:Long): List<ActiveDTO> {
+        try {
+            val date = Date(time)
+            val list = activeRepository.findByTimeCreateAfter(date)
+            if (!CollectionUtils.isEmpty(list)) {
+                for (active in list) {
+                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
+                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
+                }
+            }
+            return list
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
+        }
+    }
 }
