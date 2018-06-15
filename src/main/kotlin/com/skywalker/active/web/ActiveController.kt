@@ -103,7 +103,7 @@ class ActiveController(
     }
 
     /**
-     * 上滑活动列表
+     * 活动列表
      */
     @GetMapping
     fun listActivity(
@@ -113,25 +113,15 @@ class ActiveController(
         @RequestParam(value = "goTime") goTime: String?,
         @RequestParam(value = "time") time: Long
     ): SuccessResponse {
-        val pageable = PageRequest(0, size ?: 5)
         var params = ActiveFormParams(startAddressName, endAddressName, goTime, time)
-        return SuccessResponse(activeService.listAllByParam(params, pageable))
-
-    }
-
-    /**
-     * 最新下滑活动列表
-     */
-    @GetMapping(value = "/newActivity")
-    fun listActivityNew(
-        @RequestParam(value = "size", required = false) size: Int?,
-        @RequestParam(value = "startAddressName") startAddressName: String?,
-        @RequestParam(value = "endAddressName") endAddressName: String?,
-        @RequestParam(value = "goTime") goTime: String?,
-        @RequestParam(value = "time") time: Long
-    ): SuccessResponse {
-        var params = ActiveFormParams(startAddressName, endAddressName, goTime, dateAfter = time)
-        return SuccessResponse(activeService.listAllByParam(params, null))
+        var map: HashMap<String, Any?>?
+        map = if (null != size) {
+            val pageable = PageRequest(0, size)
+            activeService.listAllByParam(params, pageable)
+        } else {
+            activeService.listAllByParam(params, null)
+        }
+        return SuccessResponse(map)
 
     }
 
@@ -177,7 +167,7 @@ class ActiveController(
     )
 
     /**
-     * 上滑留言列表
+     * 留言列表
      */
     @GetMapping("/{activity}/activityLeaveMsg")
     fun listMsg(
@@ -185,18 +175,13 @@ class ActiveController(
         @RequestParam(value = "time") time: Long,
         @PathVariable activity: Long?
     ): SuccessResponse {
-        val pageable = PageRequest(0, size ?: 5)
-        return SuccessResponse(activeService.listActiveMsgByActiveId(activity,time, pageable))
-    }
-
-    /**
-     * 下滑最新留言列表
-     */
-    @GetMapping("/{activity}/activityLeaveMsg/newActivityLeaveMsg")
-    fun listMsgNew(
-        @RequestParam(value = "time") time: Long,
-        @PathVariable activity: Long?
-    ): SuccessResponse {
-        return SuccessResponse(activeService.listActiveMsgByActiveId(activity,time, null))
+        var map: HashMap<String, Any?>?
+        map = if (null != size) {
+            val pageable = PageRequest(0, size)
+            activeService.listActiveMsgByActiveId(activity, time, pageable)
+        } else {
+            activeService.listActiveMsgByActiveId(activity, time, null)
+        }
+        return SuccessResponse(map)
     }
 }

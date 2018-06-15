@@ -83,20 +83,20 @@ class ActiveService(
     /**
      * 活动列表
      */
-    fun listAllByTypeId(typeId: Long?, time: Long, pageable: Pageable): Page<ActiveDTO>? {
+    fun listAllByTypeId(typeId: Long?, time: Long, pageable: Pageable): HashMap<String, Any?>? {
         if (null == typeId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }
         try {
             val date = Date(time)
-            val list = activeRepository.listAllByTypeId(typeId, date, pageable)
-            if (null != list && !CollectionUtils.isEmpty(list.content)) {
-                for (active in list.content) {
+            val page = activeRepository.listAllByTypeId(typeId, date, pageable)
+            if (null != page && !CollectionUtils.isEmpty(page.content)) {
+                for (active in page.content) {
                     active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
                     active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
                 }
             }
-            return list
+            return hashMapOf("total" to (page?.totalElements ?: 0), "list" to page?.content)
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }

@@ -25,29 +25,21 @@ class ActiveTypeController(
     }
 
     /**
-     * 活动类型下滑活动列表
+     * 活动类型活动列表
      */
     @GetMapping("/{typeId}/activities")
     fun list(
         @RequestParam(value = "size", required = false) size: Int?,
         @RequestParam(value = "time") time: Long,
-        @PathVariable typeId: Long?
+        @PathVariable typeId: Long
     ): SuccessResponse {
-        val pageable = PageRequest(0, size ?: 5)
-        val page = activeService.listAllByTypeId(typeId, time, pageable)
-        var map: HashMap<String, Any?> = hashMapOf("total" to page?.totalElements, "list" to page?.content)
+        var map: HashMap<String, Any?>?
+        map = if (null != size) {
+            val pageable = PageRequest(0, size)
+            activeService.listAllByTypeId(typeId, time, pageable)
+        } else {
+            activeService.listAllNewByTypeId(typeId, time)
+        }
         return SuccessResponse(map)
-    }
-
-    /**
-     * 活动类型下上滑最新活动列表
-     */
-
-    @GetMapping("/{typeId}/activities/newActivity")
-    fun listNewActivity(
-        @PathVariable typeId: Long,
-        @RequestParam(value = "time") time: Long
-    ): SuccessResponse {
-        return SuccessResponse(activeService.listAllNewByTypeId(typeId, time))
     }
 }
