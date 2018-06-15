@@ -14,6 +14,7 @@ import com.skywalker.base.bo.MhoSkywalkerActiveLeaveMessage
 import com.skywalker.base.bo.MhoSkywalkerActiveUser
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
+import com.sun.jmx.snmp.EnumRowStatus.active
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
@@ -82,19 +83,42 @@ class ActiveService(
     /**
      * 活动列表
      */
-    fun listAllByTypeId(typeId: Long?, pageable: Pageable): Page<ActiveDTO>? {
+    fun listAllByTypeId(typeId: Long?, time: Long, pageable: Pageable): Page<ActiveDTO>? {
         if (null == typeId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }
         try {
-            val list = activeRepository.listAllByTypeId(typeId, pageable)
+            val date = Date(time)
+            val list = activeRepository.listAllByTypeId(typeId, date, pageable)
             if (null != list && !CollectionUtils.isEmpty(list.content)) {
                 for (active in list.content) {
-                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId!!)
-                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId!!)
+                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
+                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
                 }
             }
             return list
+        } catch (e: Exception) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
+        }
+    }
+
+    /**
+     * 最新活动列表
+     */
+    fun listAllNewByTypeId(typeId: Long, time: Long): HashMap<String, Any?> {
+        if (null == time) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
+        }
+        val date = Date(time)
+        try {
+            val list = activeRepository.findByTimeCreateAfter(typeId, date)
+            if (!CollectionUtils.isEmpty(list)) {
+                for (active in list!!) {
+                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
+                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
+                }
+            }
+            return hashMapOf("total" to (list?.size ?: 0), "list" to list)
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }
@@ -122,12 +146,22 @@ class ActiveService(
     /**
      * 留言列表
      */
-    fun listActiveMsgByActiveId(activeId: Long?, pageable: Pageable): Page<MhoSkywalkerActiveLeaveMessage>? {
+    fun listActiveMsgByActiveId(
+        activeId: Long?,
+        time: Long,
+        pageable: Pageable?
+    ): HashMap<String, Any?> {
         if (null == activeId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }
         try {
-            return activeLeaveMessageRepository.listAllParentByActiveId(activeId, pageable)
+            val date = Date(time)
+            if (null == pageable) {
+                val list = activeLeaveMessageRepository.findByTimeCreateAfter(activeId, date)
+                return hashMapOf("total" to (list?.size ?: 0), "list" to list)
+            }
+            val page = activeLeaveMessageRepository.listAllParentByActiveId(activeId, date, pageable)
+            return hashMapOf("total" to (page?.totalElements ?: 0), "list" to page?.content)
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }
@@ -142,7 +176,7 @@ class ActiveService(
         //当前时间减去1天
         var preDate = Date(Date().time - 24 * 60 * 60 * 1000)
         var list = activeRepository.listActiveByUserId(activeForm.postUserId, preDate)
-        if (!CollectionUtils.isEmpty(list) && list.size >= activeCteateTimes) {
+        if (!CollectionUtils.isEmpty(list) && list!!.size >= activeCteateTimes) {
             throw ServiceException(
                 ErrorConstants.ERROR_CODE_1112,
                 ErrorConstants.ERROR_MSG_1112 + activeCteateTimes + "次"
@@ -180,19 +214,19 @@ class ActiveService(
     /**
      * 活动列表
      */
-    fun listAllByParam(params: ActiveController.ActiveFormParams?, pageable: Pageable): List<ActiveDTO> {
+    fun listAllByParam(params: ActiveController.ActiveFormParams?, pageable: Pageable?): HashMap<String, Any?> {
         if (null == params) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }
         try {
-            val list = activeRepositoryImpl.listAllByParam(params, pageable)
-            if (null != list && !CollectionUtils.isEmpty(list)) {
-                for (active in list) {
+            val map = activeRepositoryImpl.listAllByParam(params, pageable)
+            if (null != map && null != map["list"]) {
+                for (active in map["list"] as List<ActiveDTO>) {
                     active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
                     active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
                 }
             }
-            return list
+            return map
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }
@@ -231,24 +265,6 @@ class ActiveService(
             return activeRepository.listAllByActiveId(activeId)
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_MSG_1110, e)
-        }
-    }
-    /**
-     * 最新活动
-     */
-    fun listAllNewAcitity(time:Long): List<ActiveDTO> {
-        try {
-            val date = Date(time)
-            val list = activeRepository.findByTimeCreateAfter(date)
-            if (!CollectionUtils.isEmpty(list)) {
-                for (active in list) {
-                    active.listActiveUserDTO = activeUserRepository.listAllByActiveId(active.activeId)
-                    active.listActiveImgDTO = activeImgRepository.listAllByActiveId(active.activeId)
-                }
-            }
-            return list
-        } catch (e: Exception) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }
     }
 }

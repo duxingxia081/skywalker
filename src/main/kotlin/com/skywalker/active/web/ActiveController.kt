@@ -2,7 +2,6 @@ package com.skywalker.active.web
 
 import com.skywalker.active.form.ActiveForm
 import com.skywalker.active.service.ActiveService
-import com.skywalker.active.service.ActiveTypeService
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
@@ -13,7 +12,6 @@ import com.skywalker.core.utils.BaseUtils
 import org.hibernate.validator.constraints.Length
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.util.CollectionUtils
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
@@ -26,8 +24,8 @@ import javax.validation.constraints.NotBlank
 
 
 @RestController
+@RequestMapping("/activity")
 class ActiveController(
-    private val activeTypeService: ActiveTypeService,
     private val activeService: ActiveService,
     private val jwtTokenUtil: JwtTokenUtil,
     private val baseTools: BaseTools
@@ -38,32 +36,31 @@ class ActiveController(
     private val suffixList: String = ""
 
     /**
-     * 活动类型
+     * 新增活动
      */
-    @RequestMapping(value = "/activeType", method = arrayOf(RequestMethod.GET))
-    fun activeType(): SuccessResponse {
-        return return SuccessResponse(activeTypeService.list())
-    }
-
-    /**
-     * 活动列表
-     */
-    @GetMapping("/activeType/{typeId}/activities")
-    fun list(
-        @RequestParam(value = "page", required = false) page: Int?,
-        @RequestParam(value = "size", required = false) size: Int?,
-        @PathVariable typeId: Long?
+    @PostMapping
+    fun createActive(
+        @Valid params: ActiveForm,
+        result: BindingResult,
+        request: HttpServletRequest
     ): SuccessResponse {
-        val pageable = PageRequest(page ?: 0, size ?: 5)
-        val page = activeService.listAllByTypeId(typeId, pageable)
-        var map: HashMap<String, Any?> = hashMapOf("total" to page?.totalElements, "list" to page?.content)
-        return SuccessResponse(map)
+        if (result.hasErrors()) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
+        }
+        val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
+            ErrorConstants.ERROR_CODE_1104,
+            ErrorConstants.ERROR_MSG_1104
+        )
+        params.postUserId = userId
+        val activeId = activeService.create(params)
+        fileUpload(params.file, activeId)
+        return SuccessResponse("成功")
     }
 
     /**
      * 活动详情
      */
-    @GetMapping("/activity/{activeId}")
+    @GetMapping("/{activeId}")
     fun list(
         @PathVariable activeId: Long?
     ): SuccessResponse {
@@ -72,24 +69,9 @@ class ActiveController(
     }
 
     /**
-     * 留言列表
-     */
-    @GetMapping("/activity/{activity}/activityLeaveMsg")
-    fun listMsg(
-        @RequestParam(value = "page", required = false) page: Int?,
-        @RequestParam(value = "size", required = false) size: Int?,
-        @PathVariable activity: Long?
-    ): SuccessResponse {
-        val pageable = PageRequest(page ?: 0, size ?: 5)
-        val page = activeService.listActiveMsgByActiveId(activity, pageable)
-        var map: HashMap<String, Any?> = hashMapOf("total" to page?.totalElements, "list" to page?.content)
-        return SuccessResponse(map)
-    }
-
-    /**
      * 加入活动
      */
-    @PostMapping("/activity/{activeId}/activityUser")
+    @PostMapping("/{activeId}/activityUser")
     fun createActivityUser(
         @PathVariable activeId: Long, request: HttpServletRequest
     ): SuccessResponse {
@@ -106,10 +88,65 @@ class ActiveController(
         return SuccessResponse(result)
     }
 
+    private fun fileUpload(list: List<MultipartFile>?, activeId: Long) {
+        if (!CollectionUtils.isEmpty(list)) {
+            try {
+                for (file in list!!) {
+                    val name = BaseUtils.fileUpLoad(file, activeImgPath, suffixList)
+                    activeService.createActiveImg(activeId, name, "img/activeImg/$name")
+                }
+            } catch (e: IOException) {
+                throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
+            }
+
+        }
+    }
+
+    /**
+     * 上滑活动列表
+     */
+    @GetMapping
+    fun listActivity(
+        @RequestParam(value = "size", required = false) size: Int?,
+        @RequestParam(value = "startAddressName") startAddressName: String?,
+        @RequestParam(value = "endAddressName") endAddressName: String?,
+        @RequestParam(value = "goTime") goTime: String?,
+        @RequestParam(value = "time") time: Long
+    ): SuccessResponse {
+        val pageable = PageRequest(0, size ?: 5)
+        var params = ActiveFormParams(startAddressName, endAddressName, goTime, time)
+        return SuccessResponse(activeService.listAllByParam(params, pageable))
+
+    }
+
+    /**
+     * 最新下滑活动列表
+     */
+    @GetMapping(value = "/newActivity")
+    fun listActivityNew(
+        @RequestParam(value = "size", required = false) size: Int?,
+        @RequestParam(value = "startAddressName") startAddressName: String?,
+        @RequestParam(value = "endAddressName") endAddressName: String?,
+        @RequestParam(value = "goTime") goTime: String?,
+        @RequestParam(value = "time") time: Long
+    ): SuccessResponse {
+        var params = ActiveFormParams(startAddressName, endAddressName, goTime, dateAfter = time)
+        return SuccessResponse(activeService.listAllByParam(params, null))
+
+    }
+
+    data class ActiveFormParams(
+        var startAddressName: String? = null,
+        var endAddressName: String? = null,
+        var goTime: String? = null,
+        var date: Long? = null,
+        var dateAfter: Long? = null
+    )
+
     /**
      * 活动留言
      */
-    @PostMapping("/activity/{activeId}/activityMsg")
+    @PostMapping("/{activeId}/activityMsg")
     fun createMsg(
         @Valid @RequestBody params: MsgParams,
         result: BindingResult,
@@ -140,74 +177,26 @@ class ActiveController(
     )
 
     /**
-     * 新增活动
+     * 上滑留言列表
      */
-    @PostMapping("/activity")
-    fun createActive(
-        @Valid params: ActiveForm,
-        result: BindingResult,
-        request: HttpServletRequest
-    ): SuccessResponse {
-        if (result.hasErrors()) {
-            throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
-        }
-        val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-            ErrorConstants.ERROR_CODE_1104,
-            ErrorConstants.ERROR_MSG_1104
-        )
-        params.postUserId = userId
-        val activeId = activeService.create(params)
-        fileUpload(params.file, activeId)
-        return SuccessResponse("成功")
-    }
-
-    private fun fileUpload(list: List<MultipartFile>?, activeId: Long) {
-        if (!CollectionUtils.isEmpty(list)) {
-            try {
-                for (file in list!!) {
-                    val name = BaseUtils.fileUpLoad(file, activeImgPath, suffixList)
-                    activeService.createActiveImg(activeId, name, "img/activeImg/$name")
-                }
-            } catch (e: IOException) {
-                throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
-            }
-
-        }
-    }
-
-    /**
-     * 活动列表
-     */
-    @GetMapping("/activity")
-    fun listActivity(
-        @RequestParam(value = "page", required = false) page: Int?,
+    @GetMapping("/{activity}/activityLeaveMsg")
+    fun listMsg(
         @RequestParam(value = "size", required = false) size: Int?,
-        @RequestParam(value = "startAddressName") startAddressName: String?,
-        @RequestParam(value = "endAddressName") endAddressName: String?,
-        @RequestParam(value = "goTime") goTime: String?
+        @RequestParam(value = "time") time: Long,
+        @PathVariable activity: Long?
     ): SuccessResponse {
-        val pageable = PageRequest(page ?: 0, size ?: 5)
-        var params = ActiveFormParams(startAddressName, endAddressName, goTime)
-        val page = activeService.listAllByParam(params, pageable)
-        return SuccessResponse(page)
-
+        val pageable = PageRequest(0, size ?: 5)
+        return SuccessResponse(activeService.listActiveMsgByActiveId(activity,time, pageable))
     }
 
-    data class ActiveFormParams(
-        var startAddressName: String? = null,
-        var endAddressName: String? = null,
-        var goTime: String? = null
-    )
-
     /**
-     * 最新活动列表
+     * 下滑最新留言列表
      */
-    @GetMapping("/activity/newActivity")
-    fun listNewActivity(
-        @RequestParam(value = "time") time: Long
+    @GetMapping("/{activity}/activityLeaveMsg/newActivityLeaveMsg")
+    fun listMsgNew(
+        @RequestParam(value = "time") time: Long,
+        @PathVariable activity: Long?
     ): SuccessResponse {
-        val list = activeService.listAllNewAcitity(time)
-        return SuccessResponse(list)
-
+        return SuccessResponse(activeService.listActiveMsgByActiveId(activity,time, null))
     }
 }

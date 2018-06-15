@@ -9,18 +9,17 @@ import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.utils.BaseTools
 import com.skywalker.travelnotes.dto.TravelNotesDTO
 import com.skywalker.travelnotes.dto.TravelNotesParamDTO
+import com.skywalker.travelnotes.form.TravelNotesForm
+import com.skywalker.travelnotes.form.TravelNotesMessageForm
 import com.skywalker.travelnotes.repository.TravelNotesImgRepository
 import com.skywalker.travelnotes.repository.TravelNotesLikeRepository
 import com.skywalker.travelnotes.repository.TravelNotesMessageRepository
 import com.skywalker.travelnotes.repository.TravelNotesRepository
-import com.skywalker.travelnotes.form.TravelNotesForm
-import com.skywalker.travelnotes.form.TravelNotesMessageForm
+import com.skywalker.travelnotes.repository.impl.TravelNotesRepositoryImpl
 import org.springframework.beans.BeanUtils
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.util.CollectionUtils
 import java.util.*
 
 
@@ -31,25 +30,19 @@ class TravelNotesService(
     private val travelNotesMessageRepository: TravelNotesMessageRepository,
     private val travelNotesLikeRepository: TravelNotesLikeRepository,
     private val travelNotesImgRepository: TravelNotesImgRepository,
+    private val travelNotesRepositoryImpl: TravelNotesRepositoryImpl,
     private val baseTools: BaseTools
 ) {
     /**
      * 游记列表
      */
-    fun listAll(param: TravelNotesParamDTO?, pageable: Pageable): Page<TravelNotesDTO>? {
+    fun listAll(param: TravelNotesParamDTO, pageable: Pageable?): HashMap<String, Any?>? {
         try {
-            var list: Page<TravelNotesDTO>? =
-                when {
-                    null != param?.postUserId -> travelNotesRepository.listByUserId(param.postUserId!!, pageable)
-                    null != param?.travelNotesId -> travelNotesRepository.listByTravelNotesId(
-                        param.travelNotesId!!,
-                        pageable
-                    )
-                    else -> travelNotesRepository.listAll(pageable)
-                }
-            if (null != list && !CollectionUtils.isEmpty(list.content)) {
-                for (travelNote in list.content) {
-                    travelNote.notesLikeCount = travelNotesLikeRepository.countByTravelNotesId(travelNote.travelNotesId)
+            var list = travelNotesRepositoryImpl.listAllByParam(param, pageable)
+            if (null != list && null != list["list"]) {
+                for (travelNote in list["list"] as List<TravelNotesDTO>) {
+                    travelNote.notesLikeCount =
+                            travelNotesLikeRepository.countByTravelNotesId(travelNote.travelNotesId)
                     travelNote.notesMsgCount =
                             travelNotesMessageRepository.countByTravelNotesId(travelNote.travelNotesId)
                     travelNote.listTravelNotesImgDTO =
@@ -57,6 +50,7 @@ class TravelNotesService(
                 }
             }
             return list
+
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }
@@ -135,13 +129,21 @@ class TravelNotesService(
      */
     fun listTravelNotesMsgByTravelNotesId(
         travelNotesId: Long?,
-        pageable: Pageable
-    ): Page<MhoSkywalkerTravelNotesMessage>? {
+        time: Long,
+        pageable: Pageable?
+    ): HashMap<String, Any?>? {
         if (null == travelNotesId) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1107, ErrorConstants.ERROR_MSG_1107)
         }
-        try {
-            return travelNotesMessageRepository.listAllParentByTravelNotesId(travelNotesId, pageable)
+        return try {
+            val date = Date(time)
+            if (null != pageable) {
+                val page = travelNotesMessageRepository.listAllParentByTravelNotesId(travelNotesId, date, pageable)
+                hashMapOf("total" to (page?.totalElements ?: 0), "list" to page?.content)
+            } else {
+                val list = travelNotesMessageRepository.findByTimeCreateAfter(travelNotesId, date)
+                hashMapOf("total" to (list?.size ?: 0), "list" to list)
+            }
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1110, ErrorConstants.ERROR_MSG_1110, e)
         }

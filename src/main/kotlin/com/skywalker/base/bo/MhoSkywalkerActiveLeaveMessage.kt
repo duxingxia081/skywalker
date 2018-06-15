@@ -5,7 +5,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@JsonIgnoreProperties(value = *arrayOf("hibernateLazyInitializer", "handler", "fieldHandler"))
+@JsonIgnoreProperties(value = ["hibernateLazyInitializer", "handler", "fieldHandler"])
 data class MhoSkywalkerActiveLeaveMessage(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
