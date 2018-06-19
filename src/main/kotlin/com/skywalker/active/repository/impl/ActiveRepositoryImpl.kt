@@ -17,8 +17,8 @@ class ActiveRepositoryImpl(
         val startAddressName = params.startAddressName
         val endAddressName = params.endAddressName
         val goTime = params.goTime
+        val activeCategory = params.activeCategory
         val date = params.date
-        val dateAfter = params.dateAfter
         var sql =
             "select new com.skywalker.active.dto.ActiveDTO(f.activeId,f.activeTitle,f.postUserId,f.typeId,f.startAddressName,f.startAddressCoordinate,f.endAddressName,f.endAddressCoordinate,f.goTime,f.days,f.charge,f.content,f.coverImage,u.userName,u.nickname,u.headImage,t.typeName,f.timeCreate)"
         var sqlCount = "select count(f.activeId)"
@@ -30,14 +30,18 @@ class ActiveRepositoryImpl(
         if (null != endAddressName) {
             hql += " and f.endAddressName ='$endAddressName'"
         }
+        if (null != activeCategory) {
+            hql += " and f.activeCategory ='$activeCategory'"
+        }
         if (null != goTime) {
             hql += " and date_format(f.goTime,'%Y-%m-%d') = '$goTime'"
         }
         if (null != date) {
-            hql += " and f.timeCreate <:date"
-        }
-        if (null != dateAfter) {
-            hql += " and f.timeCreate >:dateAfter"
+            hql += if(null!=pageable) {
+                " and f.timeCreate <:date"
+            } else{
+                " and f.timeCreate >:date"
+            }
         }
         hql += " order by f.timeCreate desc"
         val query = em.createQuery(sql + hql)
@@ -45,10 +49,6 @@ class ActiveRepositoryImpl(
         if (null != date) {
             query.setParameter("date", Date(date))
             queryCount.setParameter("date", Date(date))
-        }
-        if (null != dateAfter) {
-            query.setParameter("dateAfter", Date(dateAfter))
-            queryCount.setParameter("dateAfter", Date(dateAfter))
         }
         if(null!=pageable)
         {

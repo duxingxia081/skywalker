@@ -142,6 +142,7 @@ create table if not exists mho_skywalker_active_type (
 
 create table if not exists mho_skywalker_active (
 	active_id int(11) not null primary key auto_increment comment '活动ID',
+	active_category varchar(2) comment '活动分类1：置顶，2：推荐',
 	active_title varchar(100) not null comment '活动标题',
 	post_user_id int not null comment '发布者ID',
 	constraint fk_active_post_user_id foreign key (post_user_id) references mho_skywalker_user(user_id),
