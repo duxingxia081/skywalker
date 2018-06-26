@@ -2,7 +2,6 @@ package com.skywalker.travelnotes.web
 
 import com.skywalker.active.service.TravelNotesService
 import com.skywalker.auth.utils.JwtTokenUtil
-import com.skywalker.base.bo.MhoSkywalkerTravelNotesMessage
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.response.ServerMessage
@@ -14,7 +13,6 @@ import com.skywalker.travelnotes.dto.TravelNotesParamDTO
 import com.skywalker.travelnotes.form.TravelNotesForm
 import com.skywalker.travelnotes.form.TravelNotesMessageForm
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.util.CollectionUtils
@@ -26,8 +24,6 @@ import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
-
-@Suppress("DEPRECATION")
 @RestController
 class TravelNotesController(
     private val travelNotesService: TravelNotesService,
