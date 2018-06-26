@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8" />
+<head>
+  <title>Home</title>
+  <script th:src="@{sockjs.min.js}"></script>
+  <script th:src="@{stomp.min.js}"></script>
+  <script th:src="@{jquery.js}"></script>
+</head>
+<body>
+<p>
+  聊天室
+</p>
+
+<form id="wiselyForm">
+  <textarea rows="4" cols="60" name="text"></textarea>
+  <input type="submit"/>
+</form>
+
+<script th:inline="javascript">
+    var headers = {
+        'authorization': 'Bearer:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiZXhwIjoxNTI4ODc4NDY0fQ.0hq4N9ksxWJW8ElQoKABZZswHDuBElkbM7DpCwRTrB25_TghaOFmNJc7jG1a1E4xloxlZveE-fRyOZGjkqzSng'
+    };
+    var sock = new SockJS("/socket");
+    var stomp = Stomp.over(sock);
+    stomp.connect(headers, function() {
+        stomp.subscribe("/user/topic/message", handleNotification);
+    });
+
+    function handleNotification(response) {
+        var returnData = JSON.parse(response.body);
+        $('#output').append("<b>标题: "+returnData.title+"</b><br/>内容:" + returnData.message + "<br/>")
+    }
+</script>
+
+<div id="output"></div>
+</body>
+</html>
