@@ -1,15 +1,20 @@
 version: "3"
 services:
    mysql:
-     image: mysql:8
-     volumes:
-       - /data/mysql:/var/lib/mysql
-     restart: always
-     environment:
-       MYSQL_ROOT_PASSWORD: 666666
-       MYSQL_DATABASE: skywalker
-       MYSQL_USER: skywalker
-       MYSQL_PASSWORD: 666666
+    image: mysql:8
+    container_name: mysql
+    ports:
+        - "3306:3306"
+    expose:
+        - "3306"
+    volumes:
+      - /data/mysql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 666666
+      MYSQL_DATABASE: skywalker
+      MYSQL_USER: skywalker
+      MYSQL_PASSWORD: 666666
 
    skywalker:
     image: weizh/skywalker
