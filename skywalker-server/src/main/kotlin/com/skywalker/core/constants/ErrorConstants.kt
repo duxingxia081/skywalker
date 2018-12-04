@@ -80,4 +80,8 @@ object ErrorConstants {
     const val ERROR_CODE_1113 = "-1113"
     //错误描述-新增失败
     const val ERROR_MSG_1113= "新增失败"
+    //错误码-原密码错误
+    const val ERROR_CODE_1114 = "-1114"
+    //错误描述-原密码错误
+    const val ERROR_MSG_1114= "原密码错误"
 }

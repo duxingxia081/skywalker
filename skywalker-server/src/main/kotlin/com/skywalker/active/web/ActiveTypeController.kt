@@ -11,6 +11,7 @@ import java.util.*
 
 @RestController
 @RequestMapping("/activeType")
+@CrossOrigin
 class ActiveTypeController(
     private val activeTypeService: ActiveTypeService,
     private val activeService: ActiveService

@@ -25,6 +25,7 @@ import javax.validation.constraints.NotBlank
 
 @RestController
 @RequestMapping("/activity")
+@CrossOrigin
 class ActiveController(
     private val activeService: ActiveService,
     private val jwtTokenUtil: JwtTokenUtil,
