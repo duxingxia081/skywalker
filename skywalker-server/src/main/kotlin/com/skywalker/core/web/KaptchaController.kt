@@ -1,6 +1,7 @@
 package com.skywalker.core.web
 
 import cn.hutool.captcha.CaptchaUtil
+import com.skywalker.core.response.SuccessResponse
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -14,10 +15,10 @@ import javax.servlet.http.HttpServletResponse
 @CrossOrigin
 class KaptchaAction {
     @GetMapping
-    fun getKaptcha(response: HttpServletResponse):String {
+    fun getKaptcha(response: HttpServletResponse): SuccessResponse {
         //定义图形验证码的长和宽
         val lineCaptcha = CaptchaUtil.createCircleCaptcha(200, 100,4,50)
         lineCaptcha.setBackground(Color(220, 106, 169))
-        return lineCaptcha.imageBase64
+        return SuccessResponse(lineCaptcha.imageBase64)
     }
 }
