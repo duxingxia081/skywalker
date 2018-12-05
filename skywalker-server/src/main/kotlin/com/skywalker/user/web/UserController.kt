@@ -10,21 +10,17 @@ import com.skywalker.user.dto.SkywalkerUserDTO
 import com.skywalker.user.service.UserService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.util.StringUtils
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
-import java.lang.System.out
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin
 class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil,private val authenticationManager: AuthenticationManager) {
     @Value("\${app.img.head}")
     private val headImgPath: String = ""

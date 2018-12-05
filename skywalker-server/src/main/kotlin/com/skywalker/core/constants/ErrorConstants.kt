@@ -84,4 +84,8 @@ object ErrorConstants {
     const val ERROR_CODE_1114 = "-1114"
     //错误描述-原密码错误
     const val ERROR_MSG_1114= "原密码错误"
+    //错误码-验证码错误
+    const val ERROR_CODE_1115 = "-1115"
+    //错误描述-验证码错误
+    const val ERROR_MSG_1115= "验证码错误"
 }

@@ -27,7 +27,7 @@ class SecurityConfig(
 ) : WebSecurityConfigurerAdapter(true) {
     override fun configure(http: HttpSecurity) {
         try {
-            http.csrf().disable()
+            //http.csrf().disable()
 
             http
                 .exceptionHandling().and()
