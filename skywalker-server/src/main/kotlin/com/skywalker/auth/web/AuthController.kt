@@ -33,11 +33,10 @@ class AuthController(
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
         val captcha = request.session.getAttribute("captcha")
-        println(captcha)
-        println(params.captcha)
         if (StringUtils.isEmpty(captcha) || captcha != params.captcha) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1115, ErrorConstants.ERROR_MSG_1115)
         }
+        request.session.invalidate()
         try {
             val loginToken = UsernamePasswordAuthenticationToken(params.userName, params.password)
             val authentication = authenticationManager.authenticate(loginToken)
