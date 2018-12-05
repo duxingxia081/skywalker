@@ -20,6 +20,6 @@ class CaptchaController {
         val lineCaptcha = CaptchaUtil.createCircleCaptcha(200, 100, 4, 50)
         lineCaptcha.setBackground(Color(220, 106, 169))
         request.session.setAttribute("captcha",lineCaptcha.code)
-        return SuccessResponse(lineCaptcha.imageBase64)
+        return SuccessResponse("data:image/gif;base64,"+lineCaptcha.imageBase64)
     }
 }
