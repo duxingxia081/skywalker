@@ -14,10 +14,8 @@ import com.skywalker.base.bo.MhoSkywalkerActiveLeaveMessage
 import com.skywalker.base.bo.MhoSkywalkerActiveUser
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
-import com.sun.jmx.snmp.EnumRowStatus.active
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -12,6 +12,8 @@ data class SkywalkerUserDTO(
     var qqId: String? = null,
     @field:Length(min = 6, max = 16, message = "密码必须在6-16位之间")
     var password: String? = null,
+    @field:Length(min = 6, max = 16, message = "旧密码必须在6-16位之间")
+    var oldPassword: String? = null,
     var nickname: String? = null,
     var sign: String? = null,
     var sex: String? = null,
