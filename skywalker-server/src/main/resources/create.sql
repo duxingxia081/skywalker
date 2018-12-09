@@ -12,7 +12,7 @@ create table if not exists mho_skywalker_user (
 	sex char comment '性别',
 	address varchar(255) comment '地址',
 	qr_code_image varchar(255) comment '二维码图',
-	head_image varchar(255) comment '头像',
+	head_image BLOB comment '头像',
 	cover_image varchar(255) comment '封面图',
 	time_create datetime default current_timestamp comment '创建时间',
 	is_delete char default 0 comment '是否删除'

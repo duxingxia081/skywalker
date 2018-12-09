@@ -20,6 +20,7 @@ data class MhoSkywalkerUser(
     var sex: String? = null,
     var address: String? = null,
     var qrCodeImage: String? = null,
+    @Column(name="headImage",columnDefinition="blob")
     var headImage: String? = null,
     var coverImage: String? = null,
     @Temporal(TemporalType.TIMESTAMP)

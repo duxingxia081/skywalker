@@ -16,7 +16,7 @@ import java.util.*
 @Service
 @Transactional(readOnly = true)
 class UserServiceImpl(
-    private val userRepository: UserRepository
+        private val userRepository: UserRepository
 ) : UserService {
     @Transactional
     override fun create(userDto: SkywalkerUserDTO): SkywalkerUserDTO {
@@ -40,17 +40,17 @@ class UserServiceImpl(
         var user = userRepository.getOne(userDto.userId)
         try {
             userRepository.save(
-                user.copy(
-                    nickname = userDto.nickname ?: user.nickname,
-                    sign = userDto.sign ?: user.sign,
-                    headImage = userDto.headImage ?: user.headImage,
-                    password = encrypt(userDto.password) ?: user.password,
-                    address = userDto.address ?: user.address,
-                    sex = userDto.sex ?: user.sex,
-                    qqId = userDto.qqId ?: user.qqId,
-                    wechatId = userDto.wechatId ?: user.wechatId,
-                    mobilePhone = userDto.mobilePhone ?: user.mobilePhone
-                )
+                    user.copy(
+                            nickname = userDto.nickname ?: user.nickname,
+                            sign = userDto.sign ?: user.sign,
+                            headImage = userDto.headImage ?: user.headImage,
+                            password = encrypt(userDto.password) ?: user.password,
+                            address = userDto.address ?: user.address,
+                            sex = userDto.sex ?: user.sex,
+                            qqId = userDto.qqId ?: user.qqId,
+                            wechatId = userDto.wechatId ?: user.wechatId,
+                            mobilePhone = userDto.mobilePhone ?: user.mobilePhone
+                    )
             )
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1108, ErrorConstants.ERROR_MSG_1108, e)
@@ -88,13 +88,18 @@ class UserServiceImpl(
         var user = userRepository.getOne(userId)
         try {
             userRepository.save(
-                user.copy(
-                    headImage = headImg
-                )
+                    user.copy(
+                            headImage = headImg
+                    )
             )
         } catch (e: Exception) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1108, ErrorConstants.ERROR_MSG_1108, e)
         }
         return "修改成功"
+    }
+
+    override fun findImgByUserId(userId: Long): String? {
+        val user = userRepository.getOne(userId)
+        return user.headImage
     }
 }
