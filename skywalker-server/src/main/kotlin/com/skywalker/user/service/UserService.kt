@@ -9,4 +9,5 @@ interface UserService {
     fun findByUserName(userName: String): SkywalkerUserDTO?
     fun findById(userId: Long): UserDTO
     fun updateHead(userId: Long, headImg: String): String
+    fun findImgByUserId(userId: Long): String?
 }

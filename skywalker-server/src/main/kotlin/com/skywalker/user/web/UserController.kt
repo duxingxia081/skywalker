@@ -10,7 +10,6 @@ import com.skywalker.user.dto.SkywalkerUserDTO
 import com.skywalker.user.dto.UserDTO
 import com.skywalker.user.service.UserService
 import org.springframework.beans.BeanUtils
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.util.StringUtils
 import org.springframework.validation.BindingResult
@@ -22,12 +21,18 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/users")
-class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil, private val authenticationManager: AuthenticationManager) {
+class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil) {
     @PostMapping
-    fun create(@Valid @RequestBody params: SkywalkerUserDTO, result: BindingResult): SuccessResponse {
+    fun create(@Valid @RequestBody params: SkywalkerUserDTO, request: HttpServletRequest, result: BindingResult): SuccessResponse {
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
+
+        val captcha = request.session.getAttribute("captcha")
+        if (StringUtils.isEmpty(captcha) || captcha != params.captcha) {
+            throw ServiceException(ErrorConstants.ERROR_CODE_1115, ErrorConstants.ERROR_MSG_1115)
+        }
+        request.session.invalidate()
         return SuccessResponse(userService.create(params))
     }
 
@@ -57,6 +62,15 @@ class UserController(private val userService: UserService, private val jwtTokenU
                 ErrorConstants.ERROR_MSG_1104
         )
         return SuccessResponse(userService.findById(userId))
+    }
+
+    @GetMapping(value = "/headImg")
+    private fun getHeadImg(request: HttpServletRequest): SuccessResponse {
+        val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
+                ErrorConstants.ERROR_CODE_1104,
+                ErrorConstants.ERROR_MSG_1104
+        )
+        return SuccessResponse(userService.findImgByUserId(userId))
     }
 
     @PostMapping(value = "/headImg")
