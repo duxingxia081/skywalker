@@ -1,6 +1,7 @@
 package com.skywalker.user.web
 
 import cn.hutool.core.codec.Base64
+import cn.hutool.json.JSONUtil
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 @RestController
@@ -74,7 +76,7 @@ class UserController(private val userService: UserService, private val jwtTokenU
     }
 
     @PostMapping(value = "/headImg")
-    fun handleFileUpload(@RequestParam("file") file: MultipartFile?, request: HttpServletRequest): Any {
+    fun handleFileUpload(@RequestParam("file") file: MultipartFile?, request: HttpServletRequest, response: HttpServletResponse) {
         if (null != file && !file.isEmpty) {
             try {
                 val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
@@ -82,19 +84,22 @@ class UserController(private val userService: UserService, private val jwtTokenU
                         ErrorConstants.ERROR_MSG_1104
                 )
                 val dto = SkywalkerUserDTO()
-                val userDTO: UserDTO = userService.findById(userId)
-                userDTO.headImage = Base64.encode(file.inputStream)
-                BeanUtils.copyProperties(userDTO, dto)
-                return SuccessResponse(userService.update(dto))
+                dto.userId = userId
+                dto.headImage = Base64.encode(file.inputStream)
+                userService.update(dto)
+                response.writer.print(JSONUtil.toJsonStr(SuccessResponse("更新成功")))
             } catch (e: IOException) {
-                throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
+                response.writer.print(JSONUtil.toJsonStr(ErrorResponse(
+                        ErrorConstants.ERROR_CODE_1,
+                        ErrorConstants.ERROR_MSG_1
+                )))
             }
 
         } else {
-            return ErrorResponse(
+            response.writer.print(JSONUtil.toJsonStr(ErrorResponse(
                     ErrorConstants.SUCCESS_CODE_0,
                     ErrorConstants.SUCCESS_MSG_0_
-            )
+            )))
         }
     }
 

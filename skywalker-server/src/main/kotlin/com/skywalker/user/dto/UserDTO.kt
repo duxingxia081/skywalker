@@ -14,7 +14,6 @@ data class UserDTO(
     var sex: String? = null,
     var address: String? = null,
     var qrCodeImage: String? = null,
-    var headImage: String? = null,
     var coverImage: String? = null,
     var timeCreate: Date? = null
 )
