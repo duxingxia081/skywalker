@@ -1,14 +1,15 @@
 package com.skywalker.user.web
 
+import cn.hutool.core.codec.Base64
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.response.ErrorResponse
 import com.skywalker.core.response.SuccessResponse
-import com.skywalker.core.utils.BaseUtils
 import com.skywalker.user.dto.SkywalkerUserDTO
+import com.skywalker.user.dto.UserDTO
 import com.skywalker.user.service.UserService
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.beans.BeanUtils
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.util.StringUtils
@@ -21,12 +22,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/users")
-class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil,private val authenticationManager: AuthenticationManager) {
-    @Value("\${app.img.head}")
-    private val headImgPath: String = ""
-    @Value("\${app.img.type}")
-    private val suffixList: String = ""
-
+class UserController(private val userService: UserService, private val jwtTokenUtil: JwtTokenUtil, private val authenticationManager: AuthenticationManager) {
     @PostMapping
     fun create(@Valid @RequestBody params: SkywalkerUserDTO, result: BindingResult): SuccessResponse {
         if (result.hasErrors()) {
@@ -46,7 +42,7 @@ class UserController(private val userService: UserService, private val jwtTokenU
 
             val dto: SkywalkerUserDTO? = userService.findByUserName(params.userName!!)
             if (null != dto) {
-                if (!BCryptPasswordEncoder().matches(params.oldPassword,dto.password)) {
+                if (!BCryptPasswordEncoder().matches(params.oldPassword, dto.password)) {
                     throw ServiceException(ErrorConstants.ERROR_CODE_1114, ErrorConstants.ERROR_MSG_1114)
                 }
             }
@@ -71,8 +67,11 @@ class UserController(private val userService: UserService, private val jwtTokenU
                         ErrorConstants.ERROR_CODE_1104,
                         ErrorConstants.ERROR_MSG_1104
                 )
-                val name = BaseUtils.fileUpLoad(file, headImgPath, suffixList)
-                return SuccessResponse(userService.updateHead(userId, "img/heads/$name"))
+                val dto = SkywalkerUserDTO()
+                val userDTO: UserDTO = userService.findById(userId)
+                userDTO.headImage = Base64.encode(file.inputStream)
+                BeanUtils.copyProperties(userDTO, dto)
+                return SuccessResponse(userService.update(dto))
             } catch (e: IOException) {
                 throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
             }
