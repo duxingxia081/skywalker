@@ -41,7 +41,7 @@ class ActiveController(
      */
     @PostMapping
     fun createActive(
-        @Valid params: ActiveForm,
+        @Valid @RequestBody params: ActiveForm,
         result: BindingResult,
         request: HttpServletRequest
     ): SuccessResponse {

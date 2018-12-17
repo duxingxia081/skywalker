@@ -8,9 +8,7 @@ import com.skywalker.core.exception.ServiceException
 import com.skywalker.core.response.ErrorResponse
 import com.skywalker.core.response.SuccessResponse
 import com.skywalker.user.dto.SkywalkerUserDTO
-import com.skywalker.user.dto.UserDTO
 import com.skywalker.user.service.UserService
-import org.springframework.beans.BeanUtils
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.util.StringUtils
 import org.springframework.validation.BindingResult

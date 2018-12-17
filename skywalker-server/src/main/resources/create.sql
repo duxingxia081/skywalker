@@ -135,7 +135,7 @@ create table if not exists mho_skywalker_websocket_message (
 create table if not exists mho_skywalker_active_type (
 	type_id int(11) not null primary key auto_increment comment '活动类型ID',
 	type_name varchar(100) not null comment '活动类型名称',
-	type_image varchar(255) not null comment '活动类型图片',
+	type_image varchar(255) comment '活动类型图片',
 	time_create datetime default current_timestamp comment '创建时间',
 	is_delete char default 0 comment '是否删除'
 );
