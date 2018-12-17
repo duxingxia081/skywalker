@@ -191,3 +191,7 @@ create table if not exists mho_skywalker_active_leave_message (
 );
 insert into mho_skywalker_role (role_id, role_name) values (1, 'ROLE_ADMIN');
 insert into mho_skywalker_role (role_id, role_name) values (2, 'ROLE_USER');
+INSERT INTO mho_skywalker_active_type(type_name)VALUES('自驾游');
+INSERT INTO mho_skywalker_active_type(type_name)VALUES('亲子游');
+INSERT INTO mho_skywalker_active_type(type_name)VALUES('户外约伴');
+
