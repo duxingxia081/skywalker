@@ -27,9 +27,9 @@ import javax.validation.constraints.NotBlank
 @RequestMapping("/activity")
 @CrossOrigin
 class ActiveController(
-    private val activeService: ActiveService,
-    private val jwtTokenUtil: JwtTokenUtil,
-    private val baseTools: BaseTools
+        private val activeService: ActiveService,
+        private val jwtTokenUtil: JwtTokenUtil,
+        private val baseTools: BaseTools
 ) {
     @Value("\${app.img.activity}")
     private val activeImgPath: String = ""
@@ -41,16 +41,16 @@ class ActiveController(
      */
     @PostMapping
     fun createActive(
-        @Valid @RequestBody params: ActiveForm,
-        result: BindingResult,
-        request: HttpServletRequest
+            @Valid @RequestBody params: ActiveForm,
+            result: BindingResult,
+            request: HttpServletRequest
     ): SuccessResponse {
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-            ErrorConstants.ERROR_CODE_1104,
-            ErrorConstants.ERROR_MSG_1104
+                ErrorConstants.ERROR_CODE_1104,
+                ErrorConstants.ERROR_MSG_1104
         )
         params.postUserId = userId
         val activeId = activeService.create(params)
@@ -63,7 +63,7 @@ class ActiveController(
      */
     @GetMapping("/{activeId}")
     fun list(
-        @PathVariable activeId: Long?
+            @PathVariable activeId: Long?
     ): SuccessResponse {
         val activeDTO = activeService.findByActiveId(activeId)
         return SuccessResponse(activeDTO)
@@ -74,17 +74,17 @@ class ActiveController(
      */
     @PostMapping("/{activeId}/activityUser")
     fun createActivityUser(
-        @PathVariable activeId: Long, request: HttpServletRequest
+            @PathVariable activeId: Long, request: HttpServletRequest
     ): SuccessResponse {
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-            ErrorConstants.ERROR_CODE_1104,
-            ErrorConstants.ERROR_MSG_1104
+                ErrorConstants.ERROR_CODE_1104,
+                ErrorConstants.ERROR_MSG_1104
         )
         val result = activeService.create(activeId, userId)
         val dto = activeService.findByActiveIdOnly(activeId)
         baseTools.convertAndSendToUser(
-            dto.userName!!,
-            ServerMessage("加入活动", "有用户加入到你发布的活动")
+                dto.userName!!,
+                ServerMessage("加入活动", "有用户加入到你发布的活动")
         )
         return SuccessResponse(result)
     }
@@ -108,31 +108,31 @@ class ActiveController(
      */
     @GetMapping
     fun listActivity(
-        @RequestParam(value = "size", required = false) size: Int?,
-        @RequestParam(value = "startAddressName") startAddressName: String?,
-        @RequestParam(value = "endAddressName") endAddressName: String?,
-        @RequestParam(value = "activeCategory") activeCategory: String?,
-        @RequestParam(value = "goTime") goTime: String?,
-        @RequestParam(value = "time") time: Long?
+            @RequestParam(value = "size", required = false) size: Int?,
+            @RequestParam(value = "startAddressName") startAddressName: String?,
+            @RequestParam(value = "endAddressName") endAddressName: String?,
+            @RequestParam(value = "activeCategory") activeCategory: String?,
+            @RequestParam(value = "goTime") goTime: String?,
+            @RequestParam(value = "time") time: Long?
     ): SuccessResponse {
         var params = ActiveFormParams(startAddressName, endAddressName, goTime, activeCategory, time)
         var map: HashMap<String, Any?>?
-        map = if (null != size) {
-            val pageable = PageRequest(0, size)
-            activeService.listAllByParam(params, pageable)
+        var pageable: PageRequest = if (null != size) {
+            PageRequest(0, size)
         } else {
-            activeService.listAllByParam(params, null)
+            PageRequest(0, 5)
         }
+        map = activeService.listAllByParam(params, pageable)
         return SuccessResponse(map)
 
     }
 
     data class ActiveFormParams(
-        var startAddressName: String? = null,
-        var endAddressName: String? = null,
-        var goTime: String? = null,
-        var activeCategory: String? = null,
-        var date: Long? = null
+            var startAddressName: String? = null,
+            var endAddressName: String? = null,
+            var goTime: String? = null,
+            var activeCategory: String? = null,
+            var date: Long? = null
     )
 
     /**
@@ -140,32 +140,32 @@ class ActiveController(
      */
     @PostMapping("/{activeId}/activityMsg")
     fun createMsg(
-        @Valid @RequestBody params: MsgParams,
-        result: BindingResult,
-        @PathVariable activeId: Long,
-        request: HttpServletRequest
+            @Valid @RequestBody params: MsgParams,
+            result: BindingResult,
+            @PathVariable activeId: Long,
+            request: HttpServletRequest
     ): SuccessResponse {
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
         val userId = jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
-            ErrorConstants.ERROR_CODE_1104,
-            ErrorConstants.ERROR_MSG_1104
+                ErrorConstants.ERROR_CODE_1104,
+                ErrorConstants.ERROR_MSG_1104
         )
         val result = activeService.createMsg(activeId, userId, params.parentLeaveMessageId, params.content)
         val dto = activeService.findByActiveIdOnly(activeId)
         baseTools.convertAndSendToUser(
-            dto.userName!!,
-            ServerMessage("活动留言", "你发布的活动有用户留言，请注意查看")
+                dto.userName!!,
+                ServerMessage("活动留言", "你发布的活动有用户留言，请注意查看")
         )
         return SuccessResponse(result)
     }
 
     data class MsgParams(
-        val parentLeaveMessageId: Long? = null,
-        @field:NotBlank(message = "留言内容不能为空")
-        @field:Length(max = 100, message = "最大长度不能超过100个文字")
-        val content: String = ""
+            val parentLeaveMessageId: Long? = null,
+            @field:NotBlank(message = "留言内容不能为空")
+            @field:Length(max = 100, message = "最大长度不能超过100个文字")
+            val content: String = ""
     )
 
     /**
@@ -173,9 +173,9 @@ class ActiveController(
      */
     @GetMapping("/{activity}/activityLeaveMsg")
     fun listMsg(
-        @RequestParam(value = "size", required = false) size: Int?,
-        @RequestParam(value = "time") time: Long,
-        @PathVariable activity: Long?
+            @RequestParam(value = "size", required = false) size: Int?,
+            @RequestParam(value = "time") time: Long,
+            @PathVariable activity: Long?
     ): SuccessResponse {
         var map: HashMap<String, Any?>?
         map = if (null != size) {
