@@ -10,8 +10,8 @@ import javax.persistence.PersistenceContext
 
 @Repository
 class ActiveRepositoryImpl(
-    @PersistenceContext
-    private val em: EntityManager
+        @PersistenceContext
+        private val em: EntityManager
 ) {
     fun listAllByParam(params: ActiveController.ActiveFormParams, pageable: Pageable?): HashMap<String, Any?> {
         val startAddressName = params.startAddressName
@@ -19,11 +19,12 @@ class ActiveRepositoryImpl(
         val goTime = params.goTime
         val activeCategory = params.activeCategory
         val date = params.date
+        val userId = params.userId
         var sql =
-            "select new com.skywalker.active.dto.ActiveDTO(f.activeId,f.activeTitle,f.postUserId,f.typeId,f.startAddressName,f.startAddressCoordinate,f.endAddressName,f.endAddressCoordinate,f.goTime,f.days,f.charge,f.content,f.coverImage,u.userName,u.nickname,u.headImage,t.typeName,f.timeCreate)"
+                "select new com.skywalker.active.dto.ActiveDTO(f.activeId,f.activeTitle,f.postUserId,f.typeId,f.startAddressName,f.startAddressCoordinate,f.endAddressName,f.endAddressCoordinate,f.goTime,f.days,f.charge,f.content,f.coverImage,u.userName,u.nickname,u.headImage,t.typeName,f.timeCreate)"
         var sqlCount = "select count(f.activeId)"
         var hql =
-            " from MhoSkywalkerActive f,MhoSkywalkerUser u,MhoSkywalkerActiveType t where f.postUserId=u.userId and f.typeId=t.typeId"
+                " from MhoSkywalkerActive f,MhoSkywalkerUser u,MhoSkywalkerActiveType t where f.postUserId=u.userId and f.typeId=t.typeId"
         if (null != startAddressName) {
             hql += " and f.startAddressName like '%$startAddressName'"
         }
@@ -33,13 +34,16 @@ class ActiveRepositoryImpl(
         if (null != activeCategory) {
             hql += " and f.activeCategory ='$activeCategory'"
         }
+        if (null != userId) {
+            hql += " and f.postUserId = $userId"
+        }
         if (null != goTime) {
             hql += " and date_format(f.goTime,'%Y-%m-%d') = '$goTime'"
         }
         if (null != date) {
-            hql += if(null!=pageable) {
+            hql += if (null != pageable) {
                 " and f.timeCreate <:date"
-            } else{
+            } else {
                 " and f.timeCreate >:date"
             }
         }
@@ -50,8 +54,7 @@ class ActiveRepositoryImpl(
             query.setParameter("date", Date(date))
             queryCount.setParameter("date", Date(date))
         }
-        if(null!=pageable)
-        {
+        if (null != pageable) {
             query.firstResult = pageable.pageNumber * pageable.pageSize
             query.maxResults = pageable.pageSize
         }
