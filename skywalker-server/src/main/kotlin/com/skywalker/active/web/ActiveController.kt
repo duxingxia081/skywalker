@@ -113,10 +113,10 @@ class ActiveController(
             @RequestParam(value = "endAddressName") endAddressName: String?,
             @RequestParam(value = "activeCategory") activeCategory: String?,
             @RequestParam(value = "goTime") goTime: String?,
-            @RequestParam(value = "time") time: Long?,
+            @RequestParam(value = "activeId") activeId: Long?,
             @RequestParam(value = "userId") userId: Long?
     ): SuccessResponse {
-        var params = ActiveFormParams(startAddressName, endAddressName, goTime, activeCategory, time, userId)
+        var params = ActiveFormParams(startAddressName, endAddressName, goTime, activeCategory, activeId, userId)
         var map: HashMap<String, Any?>?
         var pageable: PageRequest = if (null != size) {
             PageRequest(0, size)
@@ -133,7 +133,7 @@ class ActiveController(
             var endAddressName: String? = null,
             var goTime: String? = null,
             var activeCategory: String? = null,
-            var date: Long? = null,
+            var activeId: Long? = null,
             var userId: Long? = null
     )
 
