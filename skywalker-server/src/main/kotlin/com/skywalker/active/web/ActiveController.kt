@@ -1,10 +1,12 @@
 package com.skywalker.active.web
 
+import cn.hutool.json.JSONUtil
 import com.skywalker.active.form.ActiveForm
 import com.skywalker.active.service.ActiveService
 import com.skywalker.auth.utils.JwtTokenUtil
 import com.skywalker.core.constants.ErrorConstants
 import com.skywalker.core.exception.ServiceException
+import com.skywalker.core.response.ErrorResponse
 import com.skywalker.core.response.ServerMessage
 import com.skywalker.core.response.SuccessResponse
 import com.skywalker.core.utils.BaseTools
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
 import java.util.*
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 
@@ -54,8 +57,7 @@ class ActiveController(
         )
         params.postUserId = userId
         val activeId = activeService.create(params)
-        fileUpload(params.file, activeId)
-        return SuccessResponse("成功")
+        return SuccessResponse(activeId)
     }
 
     /**
@@ -89,6 +91,9 @@ class ActiveController(
         return SuccessResponse(result)
     }
 
+    /**
+     * 上传图片
+     */
     private fun fileUpload(list: List<MultipartFile>?, activeId: Long) {
         if (!CollectionUtils.isEmpty(list)) {
             try {
@@ -100,6 +105,32 @@ class ActiveController(
                 throw ServiceException(ErrorConstants.ERROR_CODE_1, ErrorConstants.ERROR_MSG_1, e)
             }
 
+        }
+    }
+
+    @PostMapping(value = "/activityImg")
+    fun handleFileUpload(@RequestParam("file") file: MultipartFile?, activeId: Long, request: HttpServletRequest, response: HttpServletResponse) {
+        if (null != file && !file.isEmpty && null != activeId) {
+            try {
+                jwtTokenUtil.getUserIdFromToken(request) ?: throw ServiceException(
+                        ErrorConstants.ERROR_CODE_1104,
+                        ErrorConstants.ERROR_MSG_1104
+                )
+                val name = BaseUtils.fileUpLoad(file, activeImgPath, suffixList)
+                activeService.createActiveImg(activeId, name, "img/activeImg/$name")
+                response.writer.print(JSONUtil.toJsonStr(SuccessResponse("更新成功")))
+            } catch (e: IOException) {
+                response.writer.print(JSONUtil.toJsonStr(ErrorResponse(
+                        ErrorConstants.ERROR_CODE_1,
+                        ErrorConstants.ERROR_MSG_1
+                )))
+            }
+
+        } else {
+            response.writer.print(JSONUtil.toJsonStr(ErrorResponse(
+                    ErrorConstants.SUCCESS_CODE_0,
+                    ErrorConstants.SUCCESS_MSG_0_
+            )))
         }
     }
 
