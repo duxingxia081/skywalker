@@ -32,11 +32,11 @@ class AuthController(
         if (result.hasErrors()) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
-        val captcha = request.session.getAttribute("captcha")
+        /*val captcha = request.session.getAttribute("captcha")
         if (StringUtils.isEmpty(captcha) || captcha != params.captcha) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1115, ErrorConstants.ERROR_MSG_1115)
         }
-        request.session.invalidate()
+        request.session.invalidate()*/
         try {
             val loginToken = UsernamePasswordAuthenticationToken(params.userName, params.password)
             val authentication = authenticationManager.authenticate(loginToken)
@@ -56,8 +56,8 @@ class AuthController(
             @field:NotBlank(message = "用户名不能为空")
             val userName: String,
             @field:NotBlank(message = "密码不能为空")
-            val password: String,
-            @field:NotBlank(message = "验证码不能为空")
-            val captcha: String
+            val password: String
+            /*@field:NotBlank(message = "验证码不能为空")
+            val captcha: String*/
     )
 }

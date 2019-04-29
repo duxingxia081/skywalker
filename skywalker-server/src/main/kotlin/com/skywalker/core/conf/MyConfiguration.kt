@@ -13,8 +13,8 @@ class MyConfiguration {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry!!.addMapping("/**")
-                        .allowedOrigins("http://192.168.0.133:8100")
-                        .allowCredentials(true)
+                        .allowedOrigins("*")
+                        .allowCredentials(false)
                         .allowedMethods("GET", "POST", "PUT")
             }
         }

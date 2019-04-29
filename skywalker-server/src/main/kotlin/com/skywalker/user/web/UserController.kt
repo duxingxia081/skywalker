@@ -28,11 +28,11 @@ class UserController(private val userService: UserService, private val jwtTokenU
             throw ServiceException(ErrorConstants.ERROR_CODE_1106, result.fieldErrors)
         }
 
-        val captcha = request.session.getAttribute("captcha")
+        /*val captcha = request.session.getAttribute("captcha")
         if (StringUtils.isEmpty(captcha) || captcha != params.captcha) {
             throw ServiceException(ErrorConstants.ERROR_CODE_1115, ErrorConstants.ERROR_MSG_1115)
         }
-        request.session.invalidate()
+        request.session.invalidate()*/
         return SuccessResponse(userService.create(params))
     }
 
