@@ -138,22 +138,11 @@ class ActiveController(
      * 活动列表
      */
     @GetMapping
-    fun listActivity(
-            @RequestParam(value = "size", required = false) size: Int?,
-            @RequestParam(value = "startAddressName") startAddressName: String?,
-            @RequestParam(value = "endAddressName") endAddressName: String?,
-            @RequestParam(value = "activeCategory") activeCategory: String?,
-            @RequestParam(value = "goTime") goTime: String?,
-            @RequestParam(value = "activeId") activeId: Long?,
-            @RequestParam(value = "userId") userId: Long?
+    fun listActivity(params: ActiveFormParams
     ): SuccessResponse {
-        var params = ActiveFormParams(startAddressName, endAddressName, goTime, activeCategory, activeId, userId)
+        println(params)
         var map: HashMap<String, Any?>?
-        var pageable: PageRequest = if (null != size) {
-            PageRequest(0, size)
-        } else {
-            PageRequest(0, 5)
-        }
+        var pageable = PageRequest(0, 5)
         map = activeService.listAllByParam(params, pageable)
         return SuccessResponse(map)
 
@@ -165,7 +154,9 @@ class ActiveController(
             var goTime: String? = null,
             var activeCategory: String? = null,
             var activeId: Long? = null,
-            var userId: Long? = null
+            var userId: Long? = null,
+            var type: String? = null,
+            var activityType: Long? = null
     )
 
     /**

@@ -2,6 +2,7 @@ package com.skywalker.active.repository.impl
 
 import com.skywalker.active.dto.ActiveDTO
 import com.skywalker.active.web.ActiveController
+import io.micrometer.core.instrument.util.StringUtils
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import java.util.*
@@ -20,11 +21,19 @@ class ActiveRepositoryImpl(
         val activeCategory = params.activeCategory
         val activeId = params.activeId
         val userId = params.userId
+        val type = params.type
+        val activityType = params.activityType
         var sql =
                 "select new com.skywalker.active.dto.ActiveDTO(f.activeId,f.activeTitle,f.postUserId,f.typeId,f.startAddressName,f.startAddressCoordinate,f.endAddressName,f.endAddressCoordinate,f.goTime,f.days,f.charge,f.content,f.coverImage,u.userName,u.nickname,u.headImage,t.typeName,f.timeCreate)"
         var sqlCount = "select count(f.activeId)"
         var hql =
-                " from MhoSkywalkerActive f,MhoSkywalkerUser u,MhoSkywalkerActiveType t where f.postUserId=u.userId and f.typeId=t.typeId"
+                " from MhoSkywalkerActive f,MhoSkywalkerUser u,MhoSkywalkerActiveType t "
+        hql += if (StringUtils.isNotBlank(type) && "00" != type) {
+            " ,MhoSkywalkerActiveUser au where au.activeId=f.activeId"
+        } else {
+            " where 1=1"
+        }
+        hql += " and f.postUserId=u.userId and f.typeId=t.typeId"
         if (null != startAddressName) {
             hql += " and f.startAddressName like '%$startAddressName'"
         }
@@ -35,10 +44,21 @@ class ActiveRepositoryImpl(
             hql += " and f.activeCategory ='$activeCategory'"
         }
         if (null != userId) {
-            hql += " and f.postUserId = $userId"
+            hql += if (StringUtils.isNotBlank(type) && "00" != type) {
+                " and au.userId = $userId"
+            } else {
+                " and f.postUserId = $userId"
+            }
         }
         if (null != goTime) {
             hql += " and date_format(f.goTime,'%Y-%m-%d') = '$goTime'"
+        }
+        if (null != activityType) {
+            if (activityType == 0L) {
+                hql += " and f.activeCategory='0'"
+            } else {
+                hql += " and f.typeId=$activityType"
+            }
         }
         if (null != activeId) {
             hql += if (null != pageable) {
