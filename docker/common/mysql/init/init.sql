@@ -1,3 +1,4 @@
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '666666' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO 'skywalker'@'%' IDENTIFIED BY '666666' WITH GRANT OPTION;
-alter user 'skywalker'@'localhost' identified with mysql_native_password by '666666';
+alter user 'skywalker' identified with mysql_native_password by 'Jade_19960902';
+set password for 'root'@'%'=password('Jade_19960902');
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'skywalker'@'%';
