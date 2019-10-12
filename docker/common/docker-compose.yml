@@ -1,25 +1,34 @@
-version: "3"
+version: "3.5"
 services:
-   mysql:
-    image: mysql:8
+  mysql:
+    image: mysql
     container_name: mysql
     ports:
-        - "3306:3306"
+      - "3306:3306"
     expose:
-        - "3306"
+      - "3306"
     volumes:
-      - /data/mysql:/var/lib/mysql
+      - /mysql/data/mysql:/var/lib/mysql
+      - /mysql/data/mysql-files:/var/lib/mysql-files/
+      - /mysql/conf/mysql.cnf:/etc/mysql/my.cnf:rw
       - ./mysql/init:/docker-entrypoint-initdb.d/
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 666666
-      MYSQL_DATABASE: skywalker
-      MYSQL_USER: skywalker
-      MYSQL_PASSWORD: 666666
+      MYSQL_ROOT_PASSWORD: 'Jade_19960902'
+      MYSQL_DATABASE: 'skywalker'
+      MYSQL_USER: 'skywalker'
+      MYSQL_PASSWORD: 'Jade_19960902'
+    networks:
+      - skynet
 
-   skywalker:
+  skywalker:
     image: weizh/skywalker
     restart: always
     ports:
       - 9998:9998
-
+    networks:
+      - skynet
+networks:
+  skynet:
+    name: sky_net
+    driver: bridge
