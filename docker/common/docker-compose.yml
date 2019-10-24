@@ -26,6 +26,8 @@ services:
     restart: always
     ports:
       - 9998:9998
+    volumes:
+      - /home/docker/img:/home/docker/img
     networks:
       - skynet
 networks:
