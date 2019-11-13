@@ -10,4 +10,5 @@ interface UserService {
     fun findById(userId: Long): UserDTO
     fun updateHead(userId: Long, headImg: String): String
     fun findImgByUserId(userId: Long): String?
+    fun createOrGet(params: SkywalkerUserDTO): SkywalkerUserDTO
 }

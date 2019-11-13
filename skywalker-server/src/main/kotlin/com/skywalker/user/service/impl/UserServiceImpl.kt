@@ -7,10 +7,14 @@ import com.skywalker.user.dto.SkywalkerUserDTO
 import com.skywalker.user.dto.UserDTO
 import com.skywalker.user.repository.UserRepository
 import com.skywalker.user.service.UserService
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.BeanUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.ZonedDateTime
 import java.util.*
 
 @Service
@@ -18,6 +22,8 @@ import java.util.*
 class UserServiceImpl(
         private val userRepository: UserRepository
 ) : UserService {
+    @Value("\${app.jwt.secret}")
+    private val secret: String? = null
     @Transactional
     override fun create(userDto: SkywalkerUserDTO): SkywalkerUserDTO {
         var user = userRepository.findByUserName(userDto.userName)
@@ -101,5 +107,21 @@ class UserServiceImpl(
     override fun findImgByUserId(userId: Long): String? {
         val user = userRepository.getOne(userId)
         return user.headImage
+    }
+    override fun createOrGet(params: SkywalkerUserDTO): SkywalkerUserDTO
+    {
+        var skywalkerUserDTO = this.findByUserName(params.userName!!)
+        if(null==skywalkerUserDTO)
+        {
+            skywalkerUserDTO = this.create(params)
+        }
+        val afterOneWeek = ZonedDateTime.now().plusWeeks(1)
+        val token:String = Jwts.builder()
+                .setSubject(params.userName)
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .setExpiration(Date.from(afterOneWeek.toInstant()))
+                .compact()
+        println(token)
+        return SkywalkerUserDTO(token = token,nickname = skywalkerUserDTO.nickname,userName = skywalkerUserDTO.userName);
     }
 }

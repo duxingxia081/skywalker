@@ -21,5 +21,6 @@ data class SkywalkerUserDTO(
         var qrCodeImage: String? = null,
         var headImage: String? = null,
         var coverImage: String? = null,
-        var captcha: String? = null
+        var captcha: String? = null,
+        var token: String? = null
 )
