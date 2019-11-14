@@ -115,9 +115,10 @@ class UserServiceImpl(
         {
             skywalkerUserDTO = this.create(params)
         }
+        skywalkerUserDTO = this.findByUserName(params.userName!!)
         val afterOneWeek = ZonedDateTime.now().plusWeeks(1)
         val token:String = Jwts.builder()
-                .setSubject(params.userName)
+                .setSubject(skywalkerUserDTO!!.userId.toString())
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .setExpiration(Date.from(afterOneWeek.toInstant()))
                 .compact()
